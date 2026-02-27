@@ -11,15 +11,6 @@
 
 Penetration testing is red team activity and should be done with permission.
 
-<p align="center">
-  <br>
-  <a href="#✨-core-features">Features</a> •
-  <a href="#2-💻-installation">Installation</a> •
-  <a href="#🚀-quick-start">Quick Start</a> •
-  <a href="#❓-faq--troubleshooting">FAQ</a> •
-  <a href="#📄-license">License</a>
-</p>
-
 ## ⚠️ Legal Disclaimer
 
 **Watchtower is designed exclusively for authorized security testing and educational purposes.**
