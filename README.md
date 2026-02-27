@@ -104,26 +104,6 @@ If you want to bypass the interactive menu or are integrating Watchtower into an
 python -m watchtower.main -t https://www.example.com --skip-ask-tools
 ```
 
-## 🐳 Docker Deployment (Recommended)
-
-To avoid "Missing tools" warnings and ensure all 23+ security utilities are correctly configured, we recommend running Watchtower via Docker.
-
-### 1. Build the Image
-```bash
-docker-compose build
-```
-
-### 2. Run a Pentest
-```bash
-docker-compose run agentic-pentest python -m watchtower.main -t https://example.com
-```
-
-### 3. Generate a Report
-```bash
-docker-compose run agentic-pentest python -m watchtower.main --report pentest_report.pdf
-```
-The report will be saved to your local directory via the volume mount.
-
 
 ## 📊 Generating Reports
 
