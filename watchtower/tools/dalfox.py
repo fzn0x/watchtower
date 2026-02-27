@@ -1,0 +1,5 @@
+from watchtower.tools.runner import run_cli_tool
+
+def run(target: str, **kwargs) -> str:
+    command = ["dalfox", "url", target, "--silence", "--skip-bav"]
+    return run_cli_tool(command)
