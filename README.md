@@ -62,6 +62,12 @@ By using Watchtower, you agree to use it only on systems you own or have explici
 **Tool Requirements:**
 To utilize the AI's full capabilities, you must have the actual CLI binaries installed and accessible in your system `PATH` (e.g., `nmap`, `nuclei`, `httpx`). The framework will automatically detect which tools are missing and skip them in the UI.
 
+Install all tools:
+
+```sh
+./install_tools.sh # or with sudo
+```
+
 ### 2. 💻 Installation
 
 ```bash
@@ -122,7 +128,7 @@ python -m watchtower.main --report "pentest_report.pdf"
 Watchtower dynamically supports almost any LLM provider on the market via LangChain and LiteLLM integrations. You can override the default models from the CLI using the `--provider`, `--model`, and `--apikey` flags.
 
 ```bash
- python -m watchtower.main -t https://www.example.com --provider=https://api.dgrid.ai --model=anthropic/claude-opus-4.5 --apikey "API_KEY"
+ python -m watchtower.main -t https://www.example.com --provider=https://api.dgrid.ai/api/v1 --model=anthropic/claude-opus-4.5 --apikey "API_KEY"
 ```
 
 Example response (using httpx tool):
