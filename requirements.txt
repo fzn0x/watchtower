@@ -16,3 +16,5 @@ python-dotenv>=1.0.0
 SQLAlchemy>=2.0.0
 fpdf2>=2.8.0
 markdown>=3.5.0
+questionary>=2.0.0
+litellm>=1.0.0

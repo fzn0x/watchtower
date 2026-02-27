@@ -1,5 +1,6 @@
 import os
 import json
+from typing import List
 from pydantic import BaseModel, Field
 from langchain_core.messages import SystemMessage, HumanMessage
 from langchain_core.output_parsers import PydanticOutputParser
@@ -7,7 +8,7 @@ from watchtower.core.state import AgentState
 
 class PlannerOutput(BaseModel):
     current_plan: str = Field(description="The updated strategy based on findings.")
-    next_step: str = Field(description="The exact name of the next tool to run (e.g. 'nmap', 'httpx') or 'finish'.")
+    next_step: str | List[str] = Field(description="The exact name of the next tool(s) to run (e.g. 'nmap', 'httpx') or a list of tools for parallel recon/testing, or 'finish'.")
     is_finished: bool = Field(description="True if the pentest is complete, False otherwise.")
 
 def get_llm():
@@ -100,7 +101,7 @@ Current Findings:
 Recent Observations:
 {json.dumps(observations[-3:] if observations else [], indent=2)}
 
-Decide the next logical step. Do not repeat tools unnecessarily.
+Decide the next logical step. You can specify a single tool name (string) or a list of tool names for parallel execution (e.g., during the reconnaissance phase). Do not repeat tools unnecessarily. Ensure parallel tools don't conflict (e.g. avoid running multiple heavy scanners at once).
 {parser.get_format_instructions()}
 """
     llm = get_llm()

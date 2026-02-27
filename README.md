@@ -37,6 +37,8 @@ By using Watchtower, you agree to use it only on systems you own or have explici
   - *Content/Params*: `gobuster`, `ffuf`, `arjun`, `kiterunner`
   - *Security Analysis*: `xsstrike`, `gitleaks`, `cmseek`, `dalfox`
 - **State Management**: Uses `SQLite` locally to store a historical record of observations and findings.
+- **Parallel Reconnaissance**: Orchestrates multiple tools concurrently (e.g., `httpx` + `whatweb`) to accelerate assessment cycles.
+- **Smart Truncation**: Output-aware clipping that prioritizes security vulnerabilities and critical findings over generic logs.
 - **LLM Agnostic**: Seamlessly swap between OpenAI, Google Gemini, and OpenRouter APIs via `.env` files.
 
 ---
@@ -101,6 +103,12 @@ If you want to bypass the interactive menu or are integrating Watchtower into an
 python -m watchtower.main -t https://www.example.com --skip-ask-tools
 ```
 
+**Authenticated Pentesting:**
+Watchtower supports authenticated workflows via session cookies or custom headers.
+```bash
+python -m watchtower.main -t https://api.example.com --cookie "session=xyz123" --header "X-API-Key: secret-key"
+```
+
 
 ## 📊 Generating Reports
 
@@ -163,7 +171,9 @@ python -m watchtower.main -t https://example.com --provider=https://api.dgrid.ai
 - [x] Initial LangGraph Planner/Worker architecture.
 - [x] Integrate core web and network reconnaissance tools.
 - [x] Add Pydantic structured output fallback for open-source OpenRouter models.
-- [ ] Add support for authenticated pentesting workflows (e.g cookie injection).
+- [x] Parallel tool execution and Smart Truncation.
+- [x] Support for authenticated pentesting (cookies/headers).
+- [ ] Advanced business logic analysis enhancements.
 
 ---
 

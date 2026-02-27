@@ -21,7 +21,18 @@ def main():
     parser.add_argument("--model", help="Custom model string")
     parser.add_argument("--apikey", help="Environment variable name containing the API key (e.g. GROQ_API_KEY)")
     parser.add_argument("--report", help="Generate a PDF report from the SQLite database (provide output filename, e.g. report.pdf)")
+    parser.add_argument("--cookie", help="Session cookie to use for authenticated requests")
+    parser.add_argument("--header", action="append", help="Custom headers (format Key:Value). Can be specified multiple times.")
     args = parser.parse_args()
+
+    auth_metadata = {}
+    if args.cookie:
+        auth_metadata["Cookie"] = args.cookie
+    if args.header:
+        for h in args.header:
+            if ":" in h:
+                k, v = h.split(":", 1)
+                auth_metadata[k.strip()] = v.strip()
 
     if args.provider:
         os.environ["WATCHTOWER_PROVIDER"] = args.provider
@@ -101,6 +112,7 @@ def main():
         "observations": [],
         "current_plan": "",
         "next_step": "",
+        "auth_metadata": auth_metadata,
         "is_finished": False
     }
     

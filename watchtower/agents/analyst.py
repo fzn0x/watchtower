@@ -46,4 +46,5 @@ Extract any true findings as structured data. If the output contains only normal
         new_findings = [f.model_dump() for f in result.findings]
         return {"findings": new_findings}
     except Exception as e:
-        return {"findings": [{"title": "Analyst Error", "severity": "Info", "description": str(e), "evidence": ""}]}
+        logging.error(f"Analyst execution error: {e}")
+        return {"findings": []}
