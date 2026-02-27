@@ -104,6 +104,9 @@ You can extract all findings into a cleanly formatted PDF document without re-ru
 python -m watchtower.main --report "pentest_report.pdf"
 ```
 
+<img width="792" height="738" alt="image" src="https://github.com/user-attachments/assets/7264ec48-b48f-4419-8f44-5cc7ab821aaa" />
+
+
 ### 5. 🔌 Custom Providers
 
 Watchtower dynamically supports almost any LLM provider on the market via LangChain and LiteLLM integrations. You can override the default models from the CLI using the `--provider`, `--model`, and `--apikey` flags.
