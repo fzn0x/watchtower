@@ -106,7 +106,7 @@ def main():
     
     logging.info(f"Starting agent execution loop against target: {args.target}")
     logging.info("-" * 40)
-    for event in graph.stream(initial_state, config={"recursion_limit": 15}):
+    for event in graph.stream(initial_state, config={"recursion_limit": 100}):
         for node_name, state_updates in event.items():
             logging.info(f"==> Node Executed: [{node_name.upper()}]")
             
