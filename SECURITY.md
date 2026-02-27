@@ -30,7 +30,7 @@ Please include the following in your report:
 ### Out of Scope
 The following issues are considered out of scope for this repository's security disclosure:
 - Issues related to the third-party upstream CLI tools themselves (e.g., a buffer overflow in the Nmap binary). Please report those directly to the tool's respective maintainers.
-- AI Hallucinations: If the LLM generates an inaccurate pentest report, this is a known limitation of generative AI and not considered a security vulnerability of the framework code.
+- AI Hallucinations: If an LLM agent (Analyst, Planner, or Logic Analyst) generates an inaccurate pentest report or a flawed testing plan, this is a known limitation of generative AI and not considered a security vulnerability of the framework code.
 - "Jailbreaks" of the underlying LLM providers (e.g. bypassing Anthropic's safety filters).
 
 Thank you for helping keep Watchtower safe!

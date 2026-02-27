@@ -9,5 +9,6 @@ services:
     env_file:
       - .env
     # Run the framework. Override this with -t <target>
-    # command: python -m watchtower.main -t https://example.com
+    # To run authenticated scans, add --cookie or --header to the command
+    # command: python -m watchtower.main -t https://example.com --cookie "..."
 

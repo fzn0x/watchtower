@@ -11,7 +11,7 @@ We welcome contributions to this project!
 ## Adding a New Tool
 
 1. Create a new module in `watchtower/tools/`.
-2. Implement a Python wrapper for the tool that returns the raw output and structured data.
+2. Implement a Python wrapper for the tool in `watchtower/tools/` that accepts `**kwargs` and propagates `auth_metadata` to the `run_cli_tool` helper.
 3. Expose the tool to the `Worker` node in `watchtower/agents/worker.py`.
 
 ## Adding a New Specialized Agent

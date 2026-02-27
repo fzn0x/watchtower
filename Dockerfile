@@ -17,6 +17,7 @@ RUN apt-get update && apt-get install -y \
     golang \
     nodejs \
     npm \
+    whatweb \
     && rm -rf /var/lib/apt/lists/*
 
 # Set Go environment
@@ -29,7 +30,9 @@ RUN go install -v github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest && \
     go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest && \
     go install -v github.com/ffuf/ffuf/v2@latest && \
     go install -v github.com/OJ/gobuster/v3@latest && \
-    go install -v github.com/OWASP/Amass/v3/...@master
+    go install -v github.com/OWASP/Amass/v3/...@master && \
+    go install -v github.com/assetnote/kiterunner/cmd/kr@latest && \
+    ln -s /go/bin/kr /usr/local/bin/kiterunner
 
 # Install Ruby-based tools
 RUN gem install wpscan
@@ -43,7 +46,8 @@ RUN pip install --no-cache-dir \
     xsstrike \
     gitleaks \
     cmseek \
-    retire
+    retire \
+    sslyze
 
 # Install Nikto
 RUN git clone https://github.com/sullo/nikto.git /opt/nikto && \
