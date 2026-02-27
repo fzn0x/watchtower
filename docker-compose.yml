@@ -8,5 +8,6 @@ services:
       - .:/app
     env_file:
       - .env
-    # Default target if none is specified when running `docker-compose run agentic-pentest`
-    command: python -m watchtower.main -t https://www.edityourdockercompose.com
+    # Run the framework. Override this with -t <target>
+    # command: python -m watchtower.main -t https://example.com
+
