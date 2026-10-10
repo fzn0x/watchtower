@@ -213,4 +213,4 @@ By using this software, you agree to the conditions outlined in the [Legal Discl
 
 Created and maintained by **[fzn0x](https://github.com/fzn0x)**.
 
-A deep and sincere thank you to the open-source security community. Watchtower stands on the shoulders of giants—this framework would not exist without the incredible developers who built and maintain the underlying penetration testing and reconnaissance tools that power the core worker engine. Thank you for making security accessible.
+A deep and sincere thank you to the open-source security community. Watchtower stands on the shoulders of giants, this framework would not exist without the incredible developers who built and maintain the underlying penetration testing and reconnaissance tools that power the core worker engine. Thank you for making security accessible.
