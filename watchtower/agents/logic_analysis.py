@@ -44,7 +44,7 @@ Your responsibilities:
 Rules:
 - Base every conclusion strictly on the supplied recon data.
 - Never fabricate endpoints or parameters not present in the input.
-- Output ONLY valid JSON matching the requested schema — no prose, no markdown fences.\
+- Output ONLY valid JSON matching the requested schema: no prose, no markdown fences.\
 """
 
 
@@ -94,7 +94,7 @@ def logic_analysis_node(state: AgentState) -> dict:
     latest_tool = observations[-1].get("tool")
     if latest_tool not in RELEVANT_TOOLS:
         return {
-            "messages": [f"Skipping logic analysis — last tool '{latest_tool}' is not a recon trigger."]
+            "messages": [f"Skipping logic analysis: last tool '{latest_tool}' is not a recon trigger."]
         }
 
     recon_summary = _build_recon_summary(observations)

@@ -35,7 +35,7 @@ install_pkg() {
     ubuntu|debian|kali) apt-get install -y "$@" ;;
     fedora|rhel|centos) dnf install -y "$@" ;;
     arch|manjaro)       pacman -Sy --noconfirm "$@" ;;
-    *)                  warn "Unknown OS: $OS — skipping apt install of $*" ;;
+    *)                  warn "Unknown OS: $OS, skipping apt install of $*" ;;
   esac
 }
 
@@ -207,7 +207,7 @@ install_pkg sqlmap 2>/dev/null || {
 # 11. wpscan
 # ════════════════════════════════════════════════════════════
 log "Installing wpscan..."
-gem install wpscan 2>/dev/null || warn "wpscan gem install failed — ensure ruby-dev is present"
+gem install wpscan 2>/dev/null || warn "wpscan gem install failed, ensure ruby-dev is present"
 
 # ════════════════════════════════════════════════════════════
 # 12. testssl.sh
