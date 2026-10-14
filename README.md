@@ -51,11 +51,11 @@
 
 ## Features
 
-- **Multi-agent architecture** — a team of specialized agents reasons through the engagement:
-  - `Planner` — analyzes the target and current findings to strategize the next sequence of actions.
-  - `Worker` — dynamically executes the tools requested by the Planner.
-  - `Analyst` — parses tool `stdout`/`stderr`, filters false positives, and converts raw output into structured findings.
-- **Dynamic tool arsenal** — 23 security tools integrated via Python subprocess wrappers. The interactive CLI auto-checks your `PATH` and lets you exclude tools on the fly:
+- **Multi-agent architecture**: a team of specialized agents reasons through the engagement:
+  - `Planner`: analyzes the target and current findings to strategize the next sequence of actions.
+  - `Worker`: dynamically executes the tools requested by the Planner.
+  - `Analyst`: parses tool `stdout`/`stderr`, filters false positives, and converts raw output into structured findings.
+- **Dynamic tool arsenal**: 23 security tools integrated via Python subprocess wrappers. The interactive CLI auto-checks your `PATH` and lets you exclude tools on the fly:
   - *Network*: `nmap`, `masscan`
   - *Web recon*: `httpx`, `whatweb`, `wafw00f`
   - *Subdomain / DNS*: `subfinder`, `amass`, `dnsrecon`
@@ -63,18 +63,18 @@
   - *SSL/TLS*: `testssl.sh`, `sslyze`
   - *Content / params*: `gobuster`, `ffuf`, `arjun`, `kiterunner`
   - *Security analysis*: `xsstrike`, `gitleaks`, `cmseek`, `dalfox`
-- **State management** — uses local `SQLite` to store a historical record of observations and findings.
-- **Parallel reconnaissance** — orchestrates multiple tools concurrently (e.g. `httpx` + `whatweb`) to accelerate assessment cycles.
-- **Smart truncation** — output-aware clipping that prioritizes security vulnerabilities and critical findings over generic logs.
-- **LLM-agnostic** — swap between OpenAI, Google Gemini, OpenRouter, and dozens of other providers via `.env` or CLI flags.
+- **State management**: uses local `SQLite` to store a historical record of observations and findings.
+- **Parallel reconnaissance**: orchestrates multiple tools concurrently (e.g. `httpx` + `whatweb`) to accelerate assessment cycles.
+- **Smart truncation**: output-aware clipping that prioritizes security vulnerabilities and critical findings over generic logs.
+- **LLM-agnostic**: swap between OpenAI, Google Gemini, OpenRouter, and dozens of other providers via `.env` or CLI flags.
 
 ## Quick Start
 
 ### Prerequisites
 
-- **OS** — Linux or macOS recommended (Windows is supported via WSL2 for some networking tools).
-- **Python** — 3.11 or newer.
-- **API key** — an active key for OpenRouter, OpenAI, or Gemini.
+- **OS**: Linux or macOS recommended (Windows is supported via WSL2 for some networking tools).
+- **Python**: 3.11 or newer.
+- **API key**: an active key for OpenRouter, OpenAI, or Gemini.
 
 To use the AI's full capabilities, the actual tool binaries (`nmap`, `nuclei`, `httpx`, …) must be installed and available on your `PATH`. Watchtower automatically detects which tools are missing and skips them in the UI.
 
@@ -127,7 +127,7 @@ python -m watchtower.main -t https://www.example.com
 
 ### Interactive tool selection
 
-On launch, Watchtower shows an interactive checklist and highlights which of the 23 tools are installed on your machine. Use `<Space>` to toggle individual tools — narrowing the LLM's arsenal — and `<Enter>` to confirm.
+On launch, Watchtower shows an interactive checklist and highlights which of the 23 tools are installed on your machine. Use `<Space>` to toggle individual tools (narrowing the LLM's arsenal) and `<Enter>` to confirm.
 
 ### Headless mode
 
@@ -172,7 +172,7 @@ INFO:     - Updated state 'findings': [{'title': 'Overly Permissive CORS Configu
 
 **Supported providers include:**
 
-Anthropic · OpenAI · OpenRouter · LiteLLM · Amazon Bedrock · Vercel AI Gateway · Moonshot AI · Mistral · MiniMax · OpenCode Zen · GLM Models · Z.AI · Synthetic · Qianfan — plus **any custom HTTP endpoint** (used as a drop-in OpenAI-compatible endpoint via LangChain's `ChatOpenAI` client).
+Anthropic · OpenAI · OpenRouter · LiteLLM · Amazon Bedrock · Vercel AI Gateway · Moonshot AI · Mistral · MiniMax · OpenCode Zen · GLM Models · Z.AI · Synthetic · Qianfan, plus **any custom HTTP endpoint** (used as a drop-in OpenAI-compatible endpoint via LangChain's `ChatOpenAI` client).
 
 See the full list at [docs.litellm.ai/docs/providers](https://docs.litellm.ai/docs/providers).
 
@@ -201,9 +201,9 @@ python -m watchtower.main --report "pentest_report.pdf"
 
 ## Important Notes
 
-- **API costs** — the multi-agent workflow consumes tokens rapidly during active scanning as the Planner loops through observations. Be mindful of your API budget.
-- **Hallucinations** — while the Analyst agent filters false positives, LLMs can still draw wrong conclusions from ambiguous tool output. **Always manually verify findings.**
-- **Network stability** — some tools (`masscan`, `ffuf`) are extremely noisy and may trip upstream edge protections (e.g. Cloudflare), polluting the observation logs with `403`s.
+- **API costs**: the multi-agent workflow consumes tokens rapidly during active scanning as the Planner loops through observations. Be mindful of your API budget.
+- **Hallucinations**: while the Analyst agent filters false positives, LLMs can still draw wrong conclusions from ambiguous tool output. **Always manually verify findings.**
+- **Network stability**: some tools (`masscan`, `ffuf`) are extremely noisy and may trip upstream edge protections (e.g. Cloudflare), polluting the observation logs with `403`s.
 
 ## Troubleshooting
 
@@ -234,7 +234,7 @@ Found a security issue? Please review our [Security Policy](SECURITY.md) for res
 
 ## License
 
-Licensed under the **MIT License** — see [`LICENSE`](LICENSE) for details.
+Licensed under the **MIT License**. See [`LICENSE`](LICENSE) for details.
 
 By using this software, you agree to the conditions outlined in the [Legal Disclaimer](#legal-disclaimer). Watchtower's developers assume no liability for misuse of this tool.
 
@@ -253,4 +253,4 @@ By using Watchtower, you agree to use it only on systems you own or are explicit
 
 Created and maintained by **[fzn0x](https://github.com/fzn0x)**.
 
-A deep and sincere thank you to the open-source security community. Watchtower stands on the shoulders of giants — this framework would not exist without the developers who built and maintain the underlying penetration testing and reconnaissance tools that power its worker engine. Thank you for making security accessible.
+A deep and sincere thank you to the open-source security community. Watchtower stands on the shoulders of giants. This framework would not exist without the developers who built and maintain the underlying penetration testing and reconnaissance tools that power its worker engine. Thank you for making security accessible.
