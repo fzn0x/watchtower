@@ -2,6 +2,20 @@
 
 All notable changes to Watchtower are documented here.
 
+## 1.0.6
+
+### Fixed
+- `--effort` is lowered to the highest level each provider accepts, with a one-time notice. `--effort xhigh` or `max` with Gemini no longer crashes the run. (#30, #38)
+- `--flagship` uses the current Opus (`claude-opus-5-5`, or `anthropic/claude-opus-5.5` on OpenRouter), and reasoning runs default to 16000 output tokens instead of 128000. (#31, #38)
+- Logic analysis no longer duplicates earlier findings in the state, the database, and the PDF report. (#32, #39)
+- The analyst reviews every tool from a parallel step, not only the last one, and logic analysis runs when any tool in the step is a recon trigger. (#33, #39)
+- The planner is told the target and whether it is an IP or a hostname, and a model setup error ends the run cleanly instead of crashing. (#34, #39)
+- The `httpx` tool runs ProjectDiscovery's scanner with its documented flags instead of Python's httpx client, and `install_tools.sh` installs it again (also as `pd-httpx`), restoring it in the Docker image. (#35, #40)
+- Headless mode (`--skip-ask-tools`) offers only installed tools. (#36, #40)
+
+### Added
+- `WATCHTOWER_HTTPX_BIN` to point Watchtower at a specific httpx scanner binary.
+
 ## 1.0.5
 
 ### Added
