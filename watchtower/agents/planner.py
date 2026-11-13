@@ -82,18 +82,41 @@ def get_llm():
                 return MockInvoker()
         return MockLLM()
 
+def _describe_target(state: AgentState) -> str:
+    import ipaddress
+    from watchtower.core.targets import extract_hostname
+
+    targets = state.get("scope_targets") or []
+    if not targets:
+        return "Target: unknown"
+    target = targets[0]
+    host = extract_hostname(target)
+    try:
+        ipaddress.ip_address(host)
+        target_type = "IP address"
+    except ValueError:
+        target_type = "hostname"
+    return (
+        f"Target (authorized, in scope): {target}\n"
+        f"Host: {host} ({target_type})\n"
+        "Choose tools that fit this target: for example, subdomain and DNS enumeration do not apply to a bare IP address."
+    )
+
+
 def planner_node(state: AgentState) -> dict:
     findings = state.get("findings", [])
     observations = state.get("observations", [])
-    
+
     available_tools = state.get("available_tools", [])
     tool_list_str = "\n".join([f"- `{t}`" for t in available_tools])
-    
+
     parser = PydanticOutputParser(pydantic_object=PlannerOutput)
-    
+
     prompt = f"""
 You are an expert autonomous pentesting planner.
 Your goal is to strategize the next sequence of actions based on current findings.
+
+{_describe_target(state)}
 
 Available tools you can specify in next_step (Do NOT hallucinate tools outside this list!!):
 {tool_list_str}
@@ -108,8 +131,10 @@ Recent Observations:
 Decide the next logical step. You can specify a single tool name (string) or a list of tool names for parallel execution (e.g., during the reconnaissance phase). Do not repeat tools unnecessarily. Ensure parallel tools don't conflict (e.g. avoid running multiple heavy scanners at once).
 {parser.get_format_instructions()}
 """
-    llm = get_llm()
     try:
+        # Build the model inside the try so a provider setup error ends the plan
+        # cleanly instead of crashing the run.
+        llm = get_llm()
         # Instead of natively supported JSON outputs which fail on free OpenRouter models, we force JSON via text
         chain = llm | parser
         result = chain.invoke([HumanMessage(content=prompt)])
