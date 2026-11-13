@@ -27,16 +27,16 @@ def worker_node(state: AgentState) -> dict:
     tools_to_run = [next_step] if isinstance(next_step, str) else next_step
 
     if "finish" in tools_to_run or not tools_to_run:
-        return {"observations": []}
+        return _step_result([])
 
     target = state["scope_targets"][0]
     runnable = [t for t in tools_to_run if t in available_tools]
 
     if not runnable:
-        return {"observations": []}
+        return _step_result([])
 
     if len(runnable) == 1:
-        return {"observations": [_run_tool(runnable[0], target, auth_metadata)]}
+        return _step_result([_run_tool(runnable[0], target, auth_metadata)])
 
     # Each tool is a blocking subprocess, so threads give real concurrency.
     # executor.map preserves input order, keeping observations deterministic.
@@ -46,4 +46,10 @@ def worker_node(state: AgentState) -> dict:
             executor.map(lambda t: _run_tool(t, target, auth_metadata), runnable)
         )
 
-    return {"observations": observations}
+    return _step_result(observations)
+
+
+def _step_result(observations: list) -> dict:
+    # `observations` accumulates across steps; `latest_observations` holds only
+    # this step's results so downstream agents can review every tool that ran.
+    return {"observations": observations, "latest_observations": observations}
