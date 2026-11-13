@@ -2,6 +2,15 @@
 
 All notable changes to Watchtower are documented here.
 
+## 1.0.5
+
+### Added
+- Flagship model support with reasoning-aware configuration. New `--flagship`, `--effort`, and `--max-tokens` flags (and `WATCHTOWER_FLAGSHIP` / `WATCHTOWER_EFFORT` / `WATCHTOWER_MAX_TOKENS`) select the provider's top model and set reasoning effort. (#26, #28)
+
+### Changed
+- The LLM setup no longer forces `temperature=0` on reasoning models; temperature is omitted when reasoning is enabled so flagship models work. Reasoning is wired per provider (`reasoning_effort` for the OpenAI, Anthropic, and Gemini classes; `extra_body.reasoning` for OpenRouter and custom OpenAI-compatible endpoints).
+- Bumped provider pins for `reasoning_effort` support: `langchain-openai>=1.4.1`, `langchain-anthropic>=1.5.3`, `langchain-google-genai>=4.3.1`.
+
 ## 1.0.4
 
 ### Fixed
