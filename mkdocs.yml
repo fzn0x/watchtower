@@ -1,0 +1,62 @@
+site_name: Watchtower
+site_description: AI-powered penetration testing automation, orchestrated by LLM agents.
+site_url: https://fzn0x.github.io/watchtower/
+repo_url: https://github.com/fzn0x/watchtower
+repo_name: fzn0x/watchtower
+edit_uri: edit/main/docs/
+copyright: Copyright &copy; fzn0x. Released under the MIT License.
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: amber
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: amber
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  features:
+    - navigation.sections
+    - navigation.top
+    - navigation.footer
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.action.edit
+  icon:
+    repo: fontawesome/brands/github
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+
+nav:
+  - Home: index.md
+  - Getting started: getting-started.md
+  - Usage: usage.md
+  - LLM providers: providers.md
+  - Tools: tools.md
+  - Reports: reports.md
+  - Troubleshooting: troubleshooting.md
+  - Development: development.md
+  - Legal: legal.md
