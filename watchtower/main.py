@@ -135,6 +135,7 @@ def main():
         "messages": [],
         "findings": [],
         "observations": [],
+        "latest_observations": [],
         "current_plan": "",
         "next_step": "",
         "auth_metadata": auth_metadata,
@@ -160,7 +161,7 @@ def main():
                     memory.log_finding(target, vulnerability, finding)
             
             for key, val in state_updates.items():
-                if key not in ["messages", "observations"]: 
+                if key not in ["messages", "observations", "latest_observations"]:
                     logging.info(f"    - Updated state '{key}': {val}")
     
     logging.info("-" * 40)
