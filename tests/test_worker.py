@@ -47,6 +47,8 @@ class WorkerTests(unittest.TestCase):
         obs = result["observations"]
         self.assertEqual([o["tool"] for o in obs], tools)
         self.assertTrue(all(o["output"] == "ok:example.com" for o in obs))
+        # The whole step is published so the analyst can review every tool.
+        self.assertEqual(result["latest_observations"], obs)
 
     def test_skips_unavailable_tools(self):
         def fake_import(path):
@@ -85,7 +87,7 @@ class WorkerTests(unittest.TestCase):
             "auth_metadata": {},
             "scope_targets": ["example.com"],
         })
-        self.assertEqual(result, {"observations": []})
+        self.assertEqual(result, {"observations": [], "latest_observations": []})
 
 
 if __name__ == "__main__":
