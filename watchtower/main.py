@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 import questionary
 import shutil
 
+from watchtower import __version__
 from watchtower.core.agent_manager import create_agent_graph
 from watchtower.core.memory import MemoryStore
 from watchtower.core.guardrails import validate_target
@@ -15,6 +16,7 @@ def main():
     load_dotenv()
     
     parser = argparse.ArgumentParser(description="AI Agentic Pentesting Framework")
+    parser.add_argument("--version", action="version", version=f"watchtower {__version__}")
     parser.add_argument("-t", "--target", help="Target URL or IP", required=False)
     parser.add_argument("--skip-ask-tools", action="store_true", help="Skip tool selection")
     parser.add_argument("--provider", help="Custom LLM provider (e.g. litellm, openai, anthropic, bedrock, etc.)")
@@ -57,7 +59,7 @@ def main():
         logging.error("Target must be a valid URL or IP address.")
         return
 
-    logging.info("Initializing Agentic Pentesting Framework...")
+    logging.info(f"Initializing Watchtower {__version__} (Agentic Pentesting Framework)...")
     
     all_tools = [
         "nmap", "masscan", "httpx", "whatweb", "wafw00f",
