@@ -78,17 +78,10 @@ def get_llm():
         model, kwargs = settings("gemini", os.getenv("GEMINI_MODEL_NAME", "gemini-3.8-flash"))
         return ChatGoogleGenerativeAI(model=model, **kwargs)
     else:
-        class MockLLM:
-            def with_structured_output(self, schema):
-                class MockInvoker:
-                    def invoke(self, msgs):
-                        if schema.__name__ == "PlannerOutput":
-                            return schema(current_plan="Mock fallback: Run nmap", next_step="finish", is_finished=True)
-                        elif schema.__name__ == "AnalystOutput":
-                            return schema(findings=[])
-                        return schema()
-                return MockInvoker()
-        return MockLLM()
+        # main() checks this before a run starts; agents that still get here
+        # report the error and end the plan instead of failing obscurely.
+        from watchtower.core.llm_config import NO_PROVIDER_MESSAGE
+        raise RuntimeError(NO_PROVIDER_MESSAGE)
 
 def _describe_target(state: AgentState) -> str:
     import ipaddress
