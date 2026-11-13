@@ -13,9 +13,9 @@ Currently, only the `main` branch is actively supported with security updates. W
 
 Watchtower is a security tool, and we take its own security seriously. 
 
-If you discover a vulnerability in Watchtower that could lead to unauthorized code execution, bypass the intended LLM-sandbox constraints, or expose user API keys, please do **not** report it by creating a public GitHub issue.
+If you discover a vulnerability in Watchtower that could lead to unauthorized code execution, bypass the intended LLM-sandbox constraints, or expose user API keys, please do **not** report it by creating a public GitHub issue or a public pull request.
 
-Instead, please issue a pull request with the fix.
+Instead, report it privately through GitHub's private vulnerability reporting: open the repository's **Security** tab and click **Report a vulnerability**. This keeps the details private until a fix is ready. If private reporting is unavailable, contact the maintainer privately before disclosing.
 
 Please include the following in your report:
 1. A detailed description of the vulnerability.
