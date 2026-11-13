@@ -70,22 +70,37 @@ class PentestReport(FPDF):
         
         self.ln(10)
 
-def generate_pdf_report(db_path: str, output_path: str):
+def generate_pdf_report(db_path: str, output_path: str, run_id: str = None):
     logging.info(f"Generating PDF report from database: {db_path}")
     memory = MemoryStore(db_path)
-    findings = memory.get_all_findings()
-    
+
+    # Default to the most recent run so a report covers one assessment, not the
+    # union of every run ever stored in this database.
+    if run_id is None:
+        run_id = memory.latest_run_id()
+
+    findings = memory.get_all_findings(run_id)
+
     if not findings:
         logging.warning("No findings present in the local database to generate a report.")
-        print(f"ERROR: No pentest findings were found in {db_path}.")
+        scope = f" for run {run_id}" if run_id else ""
+        print(f"ERROR: No pentest findings were found in {db_path}{scope}.")
         return
+
+    run = memory.get_run(run_id) if run_id else None
 
     pdf = PentestReport()
     pdf.add_page()
-    
+
     # Executive Summary section
     pdf.chapter_title("Executive Summary")
-    pdf.chapter_body(f"This automated security penetration test utilized the Watchtower AI framework. The assessment discovered {len(findings)} total security findings.")
+    summary = (
+        "This automated security penetration test utilized the Watchtower AI framework. "
+        f"The assessment discovered {len(findings)} security findings."
+    )
+    if run:
+        summary += f"\n\nRun: {run[0]}\nTarget: {run[1]}\nStarted: {run[2]}"
+    pdf.chapter_body(summary)
     
     # Iterate through SQLite DB
     finding_num = 1
