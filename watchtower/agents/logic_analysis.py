@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field
 from typing import List, Optional
 from langchain_core.messages import SystemMessage, HumanMessage
 from langchain_core.output_parsers import PydanticOutputParser
-from watchtower.core.state import AgentState
+from watchtower.core.state import AgentState, latest_step_observations
 from watchtower.agents.planner import get_llm
 
 
@@ -91,10 +91,12 @@ def logic_analysis_node(state: AgentState) -> dict:
     if not observations:
         return {"messages": ["No observations found for logic analysis."]}
 
-    latest_tool = observations[-1].get("tool")
-    if latest_tool not in RELEVANT_TOOLS:
+    # Trigger when any tool from the latest step is a recon trigger, not only
+    # the last one (steps can run several tools in parallel).
+    latest_tools = [obs.get("tool") for obs in latest_step_observations(state)]
+    if not any(tool in RELEVANT_TOOLS for tool in latest_tools):
         return {
-            "messages": [f"Skipping logic analysis: last tool '{latest_tool}' is not a recon trigger."]
+            "messages": [f"Skipping logic analysis: no recon trigger among latest tools {latest_tools}."]
         }
 
     recon_summary = _build_recon_summary(observations)
@@ -120,9 +122,9 @@ def logic_analysis_node(state: AgentState) -> dict:
         chain = llm | parser
         result: IDORReasoningOutput = chain.invoke(messages)
 
-        finding = _build_finding(result)
-        existing_findings: list = state.get("findings", [])
-        return {"findings": existing_findings + [finding]}
+        # `findings` uses an additive reducer, so return only the new finding.
+        # Returning existing findings too would duplicate every one of them.
+        return {"findings": [_build_finding(result)]}
 
     except Exception as e:
         return {"messages": [f"Logic analysis error: {e}"]}

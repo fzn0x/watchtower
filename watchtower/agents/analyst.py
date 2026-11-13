@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field
 from typing import List
 from langchain_core.messages import SystemMessage, HumanMessage
 from langchain_core.output_parsers import PydanticOutputParser
-from watchtower.core.state import AgentState
+from watchtower.core.state import AgentState, latest_step_observations
 from watchtower.agents.planner import get_llm
 
 class Finding(BaseModel):
@@ -16,27 +16,38 @@ class Finding(BaseModel):
 class AnalystOutput(BaseModel):
     findings: List[Finding] = Field(description="A list of confirmed, legitimate findings. Omit false positives.")
 
+def _format_tool_outputs(observations: list) -> str:
+    sections = []
+    for obs in observations:
+        sections.append(
+            f"[Tool: {obs.get('tool', 'Unknown')}]\n"
+            f"{obs.get('output', 'None')}"
+        )
+    return "\n\n".join(sections)
+
+
 def analyst_node(state: AgentState) -> dict:
-    observations = state.get("observations", [])
-    if not observations:
+    latest = latest_step_observations(state)
+    if not latest:
         return {"findings": []}
-    
-    new_obs = observations[-1] if isinstance(observations, list) and observations else {}
-    
+
+    target = latest[0].get("target", "Unknown")
+    tools = ", ".join(obs.get("tool", "Unknown") for obs in latest)
+
     parser = PydanticOutputParser(pydantic_object=AnalystOutput)
-    
+
     prompt = f"""
 You are an expert Security Analyst. Review the raw output from the automated security tools.
 Your goal is to identify genuine security vulnerabilities or interesting misconfigurations.
 
 Tool Execution Details:
-Target: {new_obs.get('target', 'Unknown')}
-Tool Used: {new_obs.get('tool', 'Unknown')}
+Target: {target}
+Tools Used: {tools}
 
-Raw Output:
-{new_obs.get('output', 'None')}
+Raw Output (one section per tool):
+{_format_tool_outputs(latest)}
 
-Extract any true findings as structured data. If the output contains only normal behavior, return an empty list.
+Review every tool's output. Extract any true findings as structured data. If the output contains only normal behavior or tool errors, return an empty list.
 {parser.get_format_instructions()}
 """
     
