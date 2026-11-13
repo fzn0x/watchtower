@@ -1,11 +1,15 @@
 import os
 import json
+import logging
 from typing import List
 from pydantic import BaseModel, Field
 from langchain_core.messages import SystemMessage, HumanMessage
 from langchain_core.output_parsers import PydanticOutputParser
 from watchtower.core.state import AgentState
-from watchtower.core.llm_config import read_llm_runtime, select_model, build_chat_kwargs
+from watchtower.core.llm_config import read_llm_runtime, select_model, build_chat_kwargs, effort_notice
+
+# get_llm runs on every agent step; only warn about a lowered effort once.
+_effort_notices_logged = set()
 
 class PlannerOutput(BaseModel):
     current_plan: str = Field(description="The updated strategy based on findings.")
@@ -20,6 +24,10 @@ def get_llm():
 
     def settings(family, configured_model):
         # Returns (model, kwargs) with flagship selection and reasoning applied.
+        notice = effort_notice(family, rt["effort"], rt["flagship"])
+        if notice and notice not in _effort_notices_logged:
+            _effort_notices_logged.add(notice)
+            logging.warning(notice)
         model = select_model(family, configured_model, rt["flagship"])
         kwargs = build_chat_kwargs(family, rt["effort"], rt["max_tokens"], rt["flagship"])
         return model, kwargs
