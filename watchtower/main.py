@@ -3,9 +3,9 @@ import logging
 import os
 from dotenv import load_dotenv
 import questionary
-import shutil
 
 from watchtower import __version__
+from watchtower.core.binaries import split_installed
 from watchtower.core.agent_manager import create_agent_graph
 from watchtower.core.memory import MemoryStore
 from watchtower.core.guardrails import validate_target
@@ -83,25 +83,16 @@ def main():
         "ffuf", "arjun", "xsstrike", "gitleaks", "cmseek",
         "retire", "dalfox", "kiterunner"
     ]
-    selected_tools = all_tools.copy()
-    
-    if not args.skip_ask_tools:
-        # Some tools are invoked under a different binary name than their key.
-        binary_aliases = {
-            "testssl": ["testssl.sh"],
-            "kiterunner": ["kr"],
-        }
+    installed_tools, missing_tools = split_installed(all_tools)
+    if missing_tools:
+        logging.warning(f"Missing tools: {', '.join(missing_tools)}")
 
-        def is_installed(t):
-            candidates = [t] + binary_aliases.get(t, [])
-            return any(shutil.which(name) for name in candidates)
-
-        installed_tools = [tool for tool in all_tools if is_installed(tool)]
-        missing_tools = [tool for tool in all_tools if not is_installed(tool)]
-        
-        if missing_tools:
-            logging.warning(f"Missing tools: {', '.join(missing_tools)}")
-            
+    if args.skip_ask_tools:
+        # Headless mode offers the planner only tools that can actually run.
+        selected_tools = installed_tools
+        if not selected_tools:
+            logging.warning("No supported tools were found on PATH. Install them with install_tools.sh.")
+    else:
         choices = [
             questionary.Choice(tool, checked=(tool in installed_tools))
             for tool in all_tools

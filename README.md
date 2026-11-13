@@ -137,7 +137,7 @@ On launch, Watchtower shows an interactive checklist and highlights which of the
 
 ### Headless mode
 
-To skip the interactive menu (e.g. in a CI/CD pipeline), use `--skip-ask-tools` to auto-run with everything available on your `PATH`:
+To skip the interactive menu (e.g. in a CI/CD pipeline), use `--skip-ask-tools` to auto-run with every supported tool installed on your `PATH` (missing tools are logged and left out):
 
 ```bash
 python -m watchtower.main -t https://www.example.com --skip-ask-tools
@@ -257,6 +257,14 @@ These tools need a wordlist. Watchtower resolves one automatically: it uses `WAT
 
 ```bash
 export WATCHTOWER_WORDLIST=/usr/share/seclists/Discovery/Web-Content/common.txt
+```
+
+### `httpx` reports "could not run" or is shown as missing
+
+Watchtower's `httpx` tool is ProjectDiscovery's HTTP prober. Python's `httpx` package, installed with Watchtower's requirements, ships a different `httpx` command that can come first on your `PATH` (for example inside a virtualenv). Watchtower skips that command and looks for the scanner as `pd-httpx`, `httpx-toolkit`, in Go's `bin` directory, then on `PATH`. `install_tools.sh` installs it and adds `pd-httpx`. To point at a specific binary:
+
+```bash
+export WATCHTOWER_HTTPX_BIN=/root/go/bin/httpx
 ```
 
 ## Contributing
