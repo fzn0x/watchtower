@@ -69,6 +69,11 @@ def main():
         logging.error("Target must be a valid URL or IP address.")
         return
 
+    from watchtower.core.llm_config import has_provider, NO_PROVIDER_MESSAGE
+    if not has_provider():
+        logging.error(NO_PROVIDER_MESSAGE)
+        raise SystemExit(1)
+
     logging.info(f"Initializing Watchtower {__version__} (Agentic Pentesting Framework)...")
     if args.flagship or args.effort or args.max_tokens:
         logging.info(
