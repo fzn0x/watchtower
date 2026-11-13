@@ -69,9 +69,16 @@ def main():
     selected_tools = all_tools.copy()
     
     if not args.skip_ask_tools:
+        # Some tools are invoked under a different binary name than their key.
+        binary_aliases = {
+            "testssl": ["testssl.sh"],
+            "kiterunner": ["kr"],
+        }
+
         def is_installed(t):
-            return bool(shutil.which(t) or (t == "testssl" and shutil.which("testssl.sh")))
-            
+            candidates = [t] + binary_aliases.get(t, [])
+            return any(shutil.which(name) for name in candidates)
+
         installed_tools = [tool for tool in all_tools if is_installed(tool)]
         missing_tools = [tool for tool in all_tools if not is_installed(tool)]
         

@@ -222,6 +222,14 @@ This occurs with experimental, free, or unsupported models on OpenRouter (e.g. s
 
 You are using a `:free` model tier on OpenRouter and the upstream providers are rate-limiting free traffic. Wait out the timeout or switch to a different (or paid) model endpoint.
 
+### Content discovery wordlist (`ffuf`, `gobuster`)
+
+These tools need a wordlist. Watchtower resolves one automatically: it uses `WATCHTOWER_WORDLIST` if set, then common SecLists/dirb locations, and finally a small list bundled with Watchtower. To use your own:
+
+```bash
+export WATCHTOWER_WORDLIST=/usr/share/seclists/Discovery/Web-Content/common.txt
+```
+
 ## Contributing
 
 Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and guidelines on adding new tools and agents.

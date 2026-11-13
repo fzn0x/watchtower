@@ -3,4 +3,4 @@ from watchtower.core.targets import normalize_url
 
 def run(target: str, **kwargs) -> str:
     command = ["kr", "scan", normalize_url(target), "-A=apiroutes-2202"]
-    return run_cli_tool(command)
+    return run_cli_tool(command, auth_metadata=kwargs.get("auth_metadata"))
