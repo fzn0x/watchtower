@@ -5,6 +5,7 @@ from pydantic import BaseModel, Field
 from langchain_core.messages import SystemMessage, HumanMessage
 from langchain_core.output_parsers import PydanticOutputParser
 from watchtower.core.state import AgentState
+from watchtower.core.llm_config import read_llm_runtime, select_model, build_chat_kwargs
 
 class PlannerOutput(BaseModel):
     current_plan: str = Field(description="The updated strategy based on findings.")
@@ -15,56 +16,59 @@ def get_llm():
     custom_provider = os.getenv("WATCHTOWER_PROVIDER")
     custom_model = os.getenv("WATCHTOWER_MODEL", "gpt-5.6")
     apikey_env_name = os.getenv("WATCHTOWER_APIKEY_NAME")
-    
+    rt = read_llm_runtime()
+
+    def settings(family, configured_model):
+        # Returns (model, kwargs) with flagship selection and reasoning applied.
+        model = select_model(family, configured_model, rt["flagship"])
+        kwargs = build_chat_kwargs(family, rt["effort"], rt["max_tokens"], rt["flagship"])
+        return model, kwargs
+
     if custom_provider:
         api_key = os.getenv(apikey_env_name) if apikey_env_name else None
         provider = custom_provider.lower()
-        
+
         if provider.startswith("http"):
             from langchain_openai import ChatOpenAI
-            return ChatOpenAI(
-                model=custom_model, 
-                temperature=0, 
-                api_key=api_key, 
-                base_url=provider,
-            )
+            model, kwargs = settings("http", custom_model)
+            return ChatOpenAI(model=model, api_key=api_key, base_url=custom_provider, **kwargs)
         elif provider == "openai":
             from langchain_openai import ChatOpenAI
-            return ChatOpenAI(model=custom_model, temperature=0, api_key=api_key)
+            model, kwargs = settings("openai", custom_model)
+            return ChatOpenAI(model=model, api_key=api_key, **kwargs)
         elif provider == "anthropic":
             from langchain_anthropic import ChatAnthropic
-            return ChatAnthropic(model_name=custom_model, temperature=0, api_key=api_key)
+            model, kwargs = settings("anthropic", custom_model)
+            return ChatAnthropic(model_name=model, api_key=api_key, **kwargs)
         elif provider == "openrouter":
             from langchain_openai import ChatOpenAI
-            return ChatOpenAI(model=custom_model, temperature=0, api_key=api_key, base_url="https://openrouter.ai/api/v1")
+            model, kwargs = settings("openrouter", custom_model)
+            return ChatOpenAI(model=model, api_key=api_key, base_url="https://openrouter.ai/api/v1", **kwargs)
         elif provider == "litellm":
             from langchain_community.chat_models import ChatLiteLLM
-            return ChatLiteLLM(model=custom_model, temperature=0, api_key=api_key)
+            model, kwargs = settings("litellm", custom_model)
+            return ChatLiteLLM(model=model, api_key=api_key, **kwargs)
         else:
+            model, kwargs = settings("generic", custom_model)
             try:
                 from langchain.chat_models import init_chat_model
-                return init_chat_model(custom_model, model_provider=provider, temperature=0, api_key=api_key)
+                return init_chat_model(model, model_provider=provider, api_key=api_key, **kwargs)
             except Exception:
                 from langchain_community.chat_models import ChatLiteLLM
-                return ChatLiteLLM(model=custom_model, temperature=0, api_key=api_key)
+                return ChatLiteLLM(model=model, api_key=api_key, **kwargs)
 
     if os.getenv("OPENROUTER_API_KEY"):
         from langchain_openai import ChatOpenAI
-        model_name = os.getenv("OPENROUTER_MODEL_NAME", "anthropic/claude-sonnet-5.5")
-        return ChatOpenAI(
-            model=model_name, 
-            temperature=0, 
-            api_key=os.getenv("OPENROUTER_API_KEY"), 
-            base_url="https://openrouter.ai/api/v1"
-        )
+        model, kwargs = settings("openrouter", os.getenv("OPENROUTER_MODEL_NAME", "anthropic/claude-sonnet-5.5"))
+        return ChatOpenAI(model=model, api_key=os.getenv("OPENROUTER_API_KEY"), base_url="https://openrouter.ai/api/v1", **kwargs)
     elif os.getenv("OPENAI_API_KEY"):
         from langchain_openai import ChatOpenAI
-        model_name = os.getenv("OPENAI_MODEL_NAME", "gpt-5.6")
-        return ChatOpenAI(model=model_name, temperature=0)
+        model, kwargs = settings("openai", os.getenv("OPENAI_MODEL_NAME", "gpt-5.6"))
+        return ChatOpenAI(model=model, **kwargs)
     elif os.getenv("GEMINI_API_KEY"):
         from langchain_google_genai import ChatGoogleGenerativeAI
-        model_name = os.getenv("GEMINI_MODEL_NAME", "gemini-3.8-flash")
-        return ChatGoogleGenerativeAI(model=model_name, temperature=0)
+        model, kwargs = settings("gemini", os.getenv("GEMINI_MODEL_NAME", "gemini-3.8-flash"))
+        return ChatGoogleGenerativeAI(model=model, **kwargs)
     else:
         class MockLLM:
             def with_structured_output(self, schema):
