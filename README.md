@@ -55,6 +55,7 @@
   - `Planner`: analyzes the target and current findings to strategize the next sequence of actions.
   - `Worker`: dynamically executes the tools requested by the Planner.
   - `Analyst`: parses tool `stdout`/`stderr`, filters false positives, and converts raw output into structured findings.
+  - `Logic Analyst`: reviews recon output (endpoints and parameters) for business-logic and IDOR risk and drafts a step-by-step testing plan.
 - **Dynamic tool arsenal**: 23 security tools integrated via Python subprocess wrappers. The interactive CLI auto-checks your `PATH` and lets you exclude tools on the fly:
   - *Network*: `nmap`, `masscan`
   - *Web recon*: `httpx`, `whatweb`, `wafw00f`
@@ -112,10 +113,13 @@ OPENROUTER_API_KEY=""
 Optionally, override which model each provider uses. Sensible defaults are already configured:
 
 ```ini
-OPENAI_MODEL_NAME="gpt-4-turbo"
-GEMINI_MODEL_NAME="gemini-1.5-pro"
-OPENROUTER_MODEL_NAME="anthropic/claude-3-opus"
+OPENAI_MODEL_NAME="gpt-5.6"
+GEMINI_MODEL_NAME="gemini-3.8-flash"
+OPENROUTER_MODEL_NAME="anthropic/claude-sonnet-5.5"
 ```
+
+> [!NOTE]
+> Model names change often. Set these to a current model your provider offers.
 
 ## Usage
 
@@ -124,6 +128,8 @@ Specify a target URL or IP with the `-t` / `--target` flag:
 ```bash
 python -m watchtower.main -t https://www.example.com
 ```
+
+Print the installed version with `--version`.
 
 ### Interactive tool selection
 
@@ -186,6 +192,8 @@ Export all findings to a cleanly formatted PDF without re-running the pentest:
 python -m watchtower.main --report "pentest_report.pdf"
 ```
 
+Each run is recorded separately, so a report covers the most recent run by default. Pass `--run <id>` to report on an earlier run (the run id is logged at the start of each scan).
+
 <div align="center">
   <img width="792" alt="Example PDF report" src="https://github.com/user-attachments/assets/7264ec48-b48f-4419-8f44-5cc7ab821aaa">
 </div>
@@ -209,12 +217,11 @@ python -m watchtower.main --report "pentest_report.pdf"
 
 ### `model: [model_name] does not support feature: structured-outputs`
 
-This occurs with experimental, free, or unsupported models on OpenRouter (e.g. some Qwen or DeepSeek variants). Watchtower relies on LangChain's Structured Outputs to force well-formed JSON. Switch `OPENROUTER_MODEL_NAME` in `.env` to a fully supported model, such as:
+This occurs with experimental, free, or unsupported models on OpenRouter (e.g. some Qwen or DeepSeek variants). Watchtower relies on LangChain's Structured Outputs to force well-formed JSON. Switch `OPENROUTER_MODEL_NAME` in `.env` to a current, fully supported commercial model, such as:
 
-- `anthropic/claude-3.5-sonnet`
-- `openai/gpt-4o`
-- `google/gemini-1.5-pro`
-- `meta-llama/llama-3.1-70b-instruct`
+- `anthropic/claude-sonnet-5.5`
+- `openai/gpt-5.6`
+- `google/gemini-3.8-flash`
 
 > Watchtower includes a string-fallback parser for models without native structured-output support, but commercial models yield significantly better pentesting logic.
 
@@ -234,7 +241,7 @@ export WATCHTOWER_WORDLIST=/usr/share/seclists/Discovery/Web-Content/common.txt
 
 Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and guidelines on adding new tools and agents.
 
-Please do not remove any guardrails that prevent out-of-scope testing.
+Watchtower does not enforce target scope. You are responsible for testing only systems you own or are explicitly authorized to assess.
 
 ## Security
 
