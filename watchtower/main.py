@@ -26,6 +26,9 @@ def main():
     parser.add_argument("--run", help="Run id to report on (defaults to the most recent run). Used with --report.")
     parser.add_argument("--cookie", help="Session cookie to use for authenticated requests")
     parser.add_argument("--header", action="append", help="Custom headers (format Key:Value). Can be specified multiple times.")
+    parser.add_argument("--flagship", action="store_true", help="Use the provider's flagship model with reasoning at high effort.")
+    parser.add_argument("--effort", choices=["low", "medium", "high", "xhigh", "max"], help="Reasoning effort for models that support it (each provider accepts a subset).")
+    parser.add_argument("--max-tokens", type=int, dest="max_tokens", help="Maximum output tokens for the model.")
     args = parser.parse_args()
 
     auth_metadata = {}
@@ -43,6 +46,12 @@ def main():
         os.environ["WATCHTOWER_MODEL"] = args.model
     if args.apikey:
         os.environ["WATCHTOWER_APIKEY_NAME"] = args.apikey
+    if args.flagship:
+        os.environ["WATCHTOWER_FLAGSHIP"] = "1"
+    if args.effort:
+        os.environ["WATCHTOWER_EFFORT"] = args.effort
+    if args.max_tokens:
+        os.environ["WATCHTOWER_MAX_TOKENS"] = str(args.max_tokens)
 
     if args.report:
         from watchtower.reporting.reporter import generate_pdf_report
@@ -61,7 +70,12 @@ def main():
         return
 
     logging.info(f"Initializing Watchtower {__version__} (Agentic Pentesting Framework)...")
-    
+    if args.flagship or args.effort or args.max_tokens:
+        logging.info(
+            "LLM runtime: flagship=%s, effort=%s, max_tokens=%s",
+            bool(args.flagship), args.effort or "default", args.max_tokens or "default",
+        )
+
     all_tools = [
         "nmap", "masscan", "httpx", "whatweb", "wafw00f",
         "subfinder", "amass", "dnsrecon", "nuclei", "nikto",
