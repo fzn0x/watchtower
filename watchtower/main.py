@@ -21,6 +21,7 @@ def main():
     parser.add_argument("--model", help="Custom model string")
     parser.add_argument("--apikey", help="Environment variable name containing the API key (e.g. GROQ_API_KEY)")
     parser.add_argument("--report", help="Generate a PDF report from the SQLite database (provide output filename, e.g. report.pdf)")
+    parser.add_argument("--run", help="Run id to report on (defaults to the most recent run). Used with --report.")
     parser.add_argument("--cookie", help="Session cookie to use for authenticated requests")
     parser.add_argument("--header", action="append", help="Custom headers (format Key:Value). Can be specified multiple times.")
     args = parser.parse_args()
@@ -46,7 +47,7 @@ def main():
         import sys
         
         output_file = args.report if args.report.endswith(".pdf") else args.report + ".pdf"
-        generate_pdf_report("pentest_memory.db", output_file)
+        generate_pdf_report("pentest_memory.db", output_file, run_id=args.run)
         sys.exit(0)
 
     if not args.target:
@@ -99,7 +100,8 @@ def main():
             
     logging.info(f"Selected tools: {', '.join(selected_tools)}")
     memory = MemoryStore("pentest_memory.db")
-    logging.info("Memory database initialized (SQLite).")
+    run_id = memory.start_run(args.target)
+    logging.info(f"Memory database initialized (SQLite). Run id: {run_id}")
     
     graph = create_agent_graph()
     logging.info("Multi-agent state graph compiled successfully.")
