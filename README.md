@@ -153,6 +153,27 @@ python -m watchtower.main -t https://api.example.com \
   --header "X-API-Key: secret-key"
 ```
 
+### Flagship models and reasoning
+
+Watchtower defaults to balanced, cost-effective models. For harder targets you can opt into the provider's flagship model and turn on reasoning:
+
+```bash
+# Flagship model for your provider, reasoning at high effort
+python -m watchtower.main -t https://www.example.com --flagship
+
+# Or tune reasoning effort and output budget directly
+python -m watchtower.main -t https://www.example.com --effort high --max-tokens 8000
+```
+
+- `--flagship` selects the provider's top model (for example `gpt-6-astra`, `gemini-4-carbon`, or `anthropic/claude-opus-5`) and runs it at high effort.
+- `--effort` accepts `low`, `medium`, `high`, `xhigh`, `max`. Each provider supports a subset; for example OpenAI reasoning models take `low`/`medium`/`high`, so a higher value may be rejected by that provider.
+- `--max-tokens` caps the output tokens.
+
+When reasoning is on, Watchtower omits the `temperature` setting, since flagship and reasoning models reject a forced temperature. These can also be set in `.env` via `WATCHTOWER_FLAGSHIP`, `WATCHTOWER_EFFORT`, and `WATCHTOWER_MAX_TOKENS`.
+
+> [!NOTE]
+> Flagship ids and reasoning parameters change often across providers. If a model or effort value is rejected, set a current one for your provider.
+
 ## Custom Providers
 
 Watchtower supports almost any LLM provider via LangChain and LiteLLM integrations. Override the defaults from the CLI with `--provider`, `--model`, and `--apikey`:
@@ -205,6 +226,7 @@ Each run is recorded separately, so a report covers the most recent run by defau
 - [x] Add Pydantic structured-output fallback for open-source OpenRouter models.
 - [x] Parallel tool execution and smart truncation.
 - [x] Support for authenticated pentesting (cookies / headers).
+- [x] Flagship model support with reasoning-aware configuration.
 - [ ] Advanced business-logic analysis enhancements.
 
 ## Important Notes
