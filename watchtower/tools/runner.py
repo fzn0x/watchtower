@@ -1,7 +1,13 @@
 import subprocess
 import logging
 
-def run_cli_tool(command: list[str], timeout: int = 300, auth_metadata: dict = None) -> str:
+def run_cli_tool(command: list[str], timeout: int = 300, auth_metadata: dict = None,
+                 input_text: str = None) -> str:
+    """Run a tool and return its (possibly truncated) output.
+
+    `input_text`, when given, is written to the tool's stdin, for tools such as
+    dnsx that only read targets from stdin or a file.
+    """
     try:
         # Inject auth headers/cookies if provided (implementation varies per tool, 
         # but runner provides the logic for common patterns)
@@ -16,7 +22,8 @@ def run_cli_tool(command: list[str], timeout: int = 300, auth_metadata: dict = N
                         command.extend(["--headers", f"{key}: {val}"])
 
         logging.info(f"Running command: {' '.join(command)}")
-        result = subprocess.run(command, capture_output=True, text=True, timeout=timeout)
+        result = subprocess.run(command, capture_output=True, text=True, timeout=timeout,
+                                input=input_text)
         
         stdout = result.stdout or ""
         stderr = result.stderr or ""
