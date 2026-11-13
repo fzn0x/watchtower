@@ -1,34 +1,9 @@
 import shutil
 import subprocess
 import tempfile
-import urllib.parse
 
 from watchtower.tools.runner import run_cli_tool
-
-_GIT_HOSTS = {"github.com", "gitlab.com", "bitbucket.org"}
-
-
-def _looks_like_git_repo(target: str) -> bool:
-    """True if the target looks like a cloneable git repository URL.
-
-    gitleaks scans git history / a filesystem, not a live web endpoint, so it
-    only makes sense against a repository. A plain site or IP is not one.
-    """
-    if not target:
-        return False
-
-    candidate = target.strip()
-    if candidate.endswith(".git"):
-        return True
-
-    if "://" not in candidate:
-        candidate = "//" + candidate
-    parsed = urllib.parse.urlparse(candidate)
-    host = (parsed.hostname or "").lower()
-    path_parts = [p for p in parsed.path.split("/") if p]
-
-    # A known forge with an owner/repo path (e.g. github.com/owner/repo).
-    return host in _GIT_HOSTS and len(path_parts) >= 2
+from watchtower.core.targets import looks_like_git_repo as _looks_like_git_repo
 
 
 def run(target: str, **kwargs) -> str:
