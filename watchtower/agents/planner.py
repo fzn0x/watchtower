@@ -13,7 +13,7 @@ class PlannerOutput(BaseModel):
 
 def get_llm():
     custom_provider = os.getenv("WATCHTOWER_PROVIDER")
-    custom_model = os.getenv("WATCHTOWER_MODEL", "gpt-4-turbo")
+    custom_model = os.getenv("WATCHTOWER_MODEL", "gpt-5.6")
     apikey_env_name = os.getenv("WATCHTOWER_APIKEY_NAME")
     
     if custom_provider:
@@ -50,7 +50,7 @@ def get_llm():
 
     if os.getenv("OPENROUTER_API_KEY"):
         from langchain_openai import ChatOpenAI
-        model_name = os.getenv("OPENROUTER_MODEL_NAME", "anthropic/claude-3-opus")
+        model_name = os.getenv("OPENROUTER_MODEL_NAME", "anthropic/claude-sonnet-5.5")
         return ChatOpenAI(
             model=model_name, 
             temperature=0, 
@@ -59,11 +59,11 @@ def get_llm():
         )
     elif os.getenv("OPENAI_API_KEY"):
         from langchain_openai import ChatOpenAI
-        model_name = os.getenv("OPENAI_MODEL_NAME", "gpt-4-turbo")
+        model_name = os.getenv("OPENAI_MODEL_NAME", "gpt-5.6")
         return ChatOpenAI(model=model_name, temperature=0)
     elif os.getenv("GEMINI_API_KEY"):
         from langchain_google_genai import ChatGoogleGenerativeAI
-        model_name = os.getenv("GEMINI_MODEL_NAME", "gemini-1.5-pro")
+        model_name = os.getenv("GEMINI_MODEL_NAME", "gemini-3.8-flash")
         return ChatGoogleGenerativeAI(model=model_name, temperature=0)
     else:
         class MockLLM:
