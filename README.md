@@ -165,9 +165,9 @@ python -m watchtower.main -t https://www.example.com --flagship
 python -m watchtower.main -t https://www.example.com --effort high --max-tokens 8000
 ```
 
-- `--flagship` selects the provider's top model (for example `gpt-6-astra`, `gemini-4-carbon`, or `anthropic/claude-opus-5`) and runs it at high effort.
-- `--effort` accepts `low`, `medium`, `high`, `xhigh`, `max`. Each provider supports a subset; for example OpenAI reasoning models take `low`/`medium`/`high`, so a higher value may be rejected by that provider.
-- `--max-tokens` caps the output tokens.
+- `--flagship` selects the provider's top model (for example `gpt-6-astra`, `gemini-4-carbon`, `claude-opus-5-5`, or `anthropic/claude-opus-5.5` on OpenRouter) and runs it at high effort.
+- `--effort` accepts `low`, `medium`, `high`, `xhigh`, `max`. Watchtower lowers the value to the highest level each provider supports and logs a notice when it does: Anthropic accepts the full range, while OpenAI, OpenRouter, Gemini, and LiteLLM top out at `high`.
+- `--max-tokens` caps the output tokens. When reasoning is on and this is not set, it defaults to 16000.
 
 When reasoning is on, Watchtower omits the `temperature` setting, since flagship and reasoning models reject a forced temperature. These can also be set in `.env` via `WATCHTOWER_FLAGSHIP`, `WATCHTOWER_EFFORT`, and `WATCHTOWER_MAX_TOKENS`.
 
