@@ -2,6 +2,22 @@
 
 All notable changes to Watchtower are documented here.
 
+## 1.0.7
+
+### Added
+- Five recon tools: `katana` (crawler that also parses JavaScript), `gau` (archived URLs for the host), `naabu` (port discovery without root), `dnsx` (DNS records with answers), and `trufflehog` (verified secrets in repositories), for 28 tools in total. `katana` and `gau` also feed the IDOR review. (#9, #48)
+- A documentation site at https://fzn0x.github.io/watchtower/, deployed from `main`. (#8, #47)
+- Continuous integration: every push and pull request runs the tests on Python 3.10 to 3.13; changes to the Dockerfile, installer, or requirements build the Docker image on Linux and verify Watchtower, the httpx scanner, and every tool inside it. (#42, #45)
+- Releases are published by CI from version tags, with notes taken from this changelog. (#42, #45)
+
+### Fixed
+- `install_tools.sh`: testssl clones from its new home (the old repository is now empty), gitleaks installs from its declared module path, kiterunner matches versioned release assets and is verified against the release checksums, Go build failures are reported instead of hidden, and Go tools with versioned module paths (`gitleaks`, `amass`, `gobuster`, `ffuf`, `dalfox`) are linked into `/usr/local/bin` on non-Docker installs. (#45)
+- A run with no LLM provider configured stops with a clear message before any tool runs, instead of an opaque planner error. (#43, #46)
+
+### Changed
+- The Docker image caches its tool layer, so code changes no longer reinstall every tool. (#45)
+- The README is now a landing page; long-form documentation moved to the docs site, and Python 3.10 is the documented minimum. (#47)
+
 ## 1.0.6
 
 ### Fixed
