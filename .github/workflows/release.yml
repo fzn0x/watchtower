@@ -1,0 +1,78 @@
+name: Release
+
+# Publishes the GitHub release when a version tag (for example 1.0.7) is pushed.
+# The tag must match __version__, the tests and the Docker image check must
+# pass, and the notes come from that version's section of CHANGELOG.md.
+on:
+  push:
+    tags: ["[0-9]+.[0-9]+.[0-9]+"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Run tests
+        run: python -m unittest discover -s tests -v
+
+  image:
+    name: Docker image
+    uses: ./.github/workflows/docker.yml
+
+  release:
+    name: Publish release
+    needs: [test, image]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Tag matches the package version
+        run: |
+          version="$(python3 -c 'import re; print(re.search(r"__version__ = \"(.+?)\"", open("watchtower/__init__.py").read()).group(1))')"
+          if [ "$version" != "$GITHUB_REF_NAME" ]; then
+            echo "Tag $GITHUB_REF_NAME does not match __version__ $version" >&2
+            exit 1
+          fi
+
+      - name: Build release notes from CHANGELOG.md
+        run: |
+          # The tag just before this one in version order, for the compare link.
+          previous="$(git tag --list '[0-9]*.[0-9]*.[0-9]*' --sort=v:refname \
+            | awk -v cur="$GITHUB_REF_NAME" '$0 == cur { print prev; exit } { prev = $0 }')"
+          python3 scripts/release_notes.py "$GITHUB_REF_NAME" "$previous" "$GITHUB_REPOSITORY" > notes.md
+          cat notes.md
+
+      - name: Publish the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            echo "Release $GITHUB_REF_NAME already exists; updating its notes."
+            gh release edit "$GITHUB_REF_NAME" --notes-file notes.md
+          else
+            gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --notes-file notes.md --verify-tag
+          fi

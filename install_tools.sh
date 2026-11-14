@@ -79,47 +79,84 @@ install_go
 export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin
 
 # ── Helper: install Go binary ──────────────────────────────
+# Reports a failed build instead of hiding it, then links the binary into
+# /usr/local/bin. The binary is named after the package's last path element,
+# skipping a trailing "/..." and a major-version suffix such as "/v8".
 go_install() {
   local name=$1
   local pkg=$2
   log "Installing $name..."
-  GOPATH=$HOME/go go install "$pkg" 2>&1 | tail -3 || warn "Failed to install $name"
+  local log_file="/tmp/go_install_${name}.log"
+  if ! GOPATH=$HOME/go go install "$pkg" >"$log_file" 2>&1; then
+    tail -5 "$log_file"
+    warn "Failed to install $name"
+    return 0
+  fi
+  local path="${pkg%%@*}"
+  path="${path%/...}"
   local bin
-  bin=$(basename "${pkg%%@*}")
-  [[ -f "$HOME/go/bin/$bin" ]] && ln -sf "$HOME/go/bin/$bin" /usr/local/bin/"$bin" || true
+  bin=$(basename "$path")
+  if [[ "$bin" =~ ^v[0-9]+$ ]]; then
+    bin=$(basename "$(dirname "$path")")
+  fi
+  if [[ -f "$HOME/go/bin/$bin" ]]; then
+    ln -sf "$HOME/go/bin/$bin" /usr/local/bin/"$bin"
+  else
+    warn "$name built, but $HOME/go/bin/$bin was not found"
+  fi
 }
 
 # ── Helper: install GitHub release binary ─────────────────
+# Installs a binary from the latest release asset whose name matches
+# asset_regex. When the release publishes a checksums.txt, the download is
+# verified against it and not installed on a mismatch.
 github_release_install() {
-  local name=$1 repo=$2 asset_pattern=$3 binary_name=$4
+  local name=$1 repo=$2 asset_regex=$3 binary_name=$4
   log "Installing $name from GitHub releases..."
-  local url
-  url=$(curl -s "https://api.github.com/repos/${repo}/releases/latest" \
-        | grep "browser_download_url" \
-        | grep -E "$asset_pattern" \
-        | head -1 \
-        | cut -d '"' -f4)
+  local release urls url sums_url
+  if ! release=$(curl -fsSL "https://api.github.com/repos/${repo}/releases/latest"); then
+    warn "Could not query releases for $name"
+    return 0
+  fi
+  urls=$(printf '%s' "$release" | grep -o '"browser_download_url": *"[^"]*"' | cut -d '"' -f4)
+  url=$(printf '%s\n' "$urls" | grep -E "$asset_regex" | head -1)
+  sums_url=$(printf '%s\n' "$urls" | grep -E 'checksums\.txt$' | head -1)
   if [[ -z "$url" ]]; then
     warn "Could not find release asset for $name"
-    return
+    return 0
   fi
-  local tmp="/tmp/${name}_release"
-  mkdir -p "$tmp"
-  wget -q "$url" -O "$tmp/asset"
-  if file "$tmp/asset" | grep -q "Zip\|zip"; then
-    unzip -o "$tmp/asset" -d "$tmp/extracted"
-  elif file "$tmp/asset" | grep -q "gzip\|tar"; then
-    tar -xzf "$tmp/asset" -C "$tmp/extracted" 2>/dev/null || tar -xf "$tmp/asset" -C "$tmp/extracted" 2>/dev/null || true
-  else
-    cp "$tmp/asset" "$tmp/extracted/$binary_name"
+  local tmp asset
+  tmp=$(mktemp -d)
+  asset="$tmp/$(basename "$url")"
+  if ! wget -q "$url" -O "$asset"; then
+    warn "Download failed for $name"
+    rm -rf "$tmp"
+    return 0
   fi
+  if [[ -n "$sums_url" ]]; then
+    if wget -q "$sums_url" -O "$tmp/checksums.txt" \
+       && (cd "$tmp" && grep " $(basename "$asset")\$" checksums.txt | sha256sum -c - >/dev/null); then
+      log "$name checksum verified."
+    else
+      warn "Checksum verification failed for $name; not installing it."
+      rm -rf "$tmp"
+      return 0
+    fi
+  fi
+  mkdir -p "$tmp/extracted"
+  case "$asset" in
+    *.zip)          unzip -oq "$asset" -d "$tmp/extracted" || true ;;
+    *.tar.gz|*.tgz) tar -xzf "$asset" -C "$tmp/extracted" || true ;;
+    *)              cp "$asset" "$tmp/extracted/$binary_name" ;;
+  esac
   local bin
-  bin=$(find "$tmp/extracted" -name "$binary_name" -type f 2>/dev/null | head -1)
-  if [[ -z "$bin" ]]; then
-    # maybe the asset itself is the binary
-    bin=$(find "$tmp" -maxdepth 1 -name "asset")
+  bin=$(find "$tmp/extracted" -type f -name "$binary_name" | head -1)
+  if [[ -n "$bin" ]]; then
+    install -m 755 "$bin" /usr/local/bin/"$binary_name"
+    log "$name installed."
+  else
+    warn "$binary_name was not found in the $name release asset"
   fi
-  [[ -n "$bin" ]] && install -m 755 "$bin" /usr/local/bin/"$binary_name" && log "$name installed."
   rm -rf "$tmp"
 }
 
@@ -222,9 +259,19 @@ gem install wpscan 2>/dev/null || warn "wpscan gem install failed, ensure ruby-d
 # 12. testssl.sh
 # ════════════════════════════════════════════════════════════
 log "Installing testssl.sh..."
+# The project moved from drwetter/testssl.sh (now an empty repository) to
+# testssl/testssl.sh; the 3.2 branch is the stable release line.
 cd /opt/security-tools
-git clone --depth 1 https://github.com/drwetter/testssl.sh.git 2>/dev/null || true
-ln -sf /opt/security-tools/testssl.sh/testssl.sh /usr/local/bin/testssl
+if [[ ! -f testssl.sh/testssl.sh ]]; then
+  rm -rf testssl.sh
+  git clone --depth 1 --branch 3.2 https://github.com/testssl/testssl.sh.git testssl.sh \
+    || warn "testssl.sh clone failed"
+fi
+if [[ -f /opt/security-tools/testssl.sh/testssl.sh ]]; then
+  ln -sf /opt/security-tools/testssl.sh/testssl.sh /usr/local/bin/testssl
+else
+  warn "testssl.sh was not installed"
+fi
 
 # ════════════════════════════════════════════════════════════
 # 13. sslyze
@@ -264,7 +311,8 @@ chmod +x /usr/local/bin/xsstrike
 # ════════════════════════════════════════════════════════════
 # 18. gitleaks
 # ════════════════════════════════════════════════════════════
-go_install gitleaks github.com/gitleaks/gitleaks/v8@latest
+# The module still declares its original path, so install it under that name.
+go_install gitleaks github.com/zricethezav/gitleaks/v8@latest
 
 # ════════════════════════════════════════════════════════════
 # 19. cmseek
@@ -298,9 +346,12 @@ go_install dalfox github.com/hahwul/dalfox/v2@latest
 # 22. kiterunner
 # ════════════════════════════════════════════════════════════
 log "Installing kiterunner..."
-KITE_REPO="assetnote/kiterunner"
-KITE_ASSET="kiterunner_linux_amd64.tar.gz"
-github_release_install kiterunner "$KITE_REPO" "$KITE_ASSET" "kr"
+# Release assets are versioned, e.g. kiterunner_1.0.2_linux_amd64.tar.gz.
+case "$(uname -m)" in
+  aarch64|arm64) KITE_ARCH="arm64" ;;
+  *)             KITE_ARCH="amd64" ;;
+esac
+github_release_install kiterunner "assetnote/kiterunner" "kiterunner_[0-9.]+_linux_${KITE_ARCH}\.tar\.gz$" "kr"
 
 # ════════════════════════════════════════════════════════════
 # Download nuclei templates

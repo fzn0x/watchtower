@@ -1,0 +1,52 @@
+name: Docker image
+
+# Builds the image on Linux through install_tools.sh and verifies it. Runs when
+# anything that goes into the image's tool or dependency layers changes, on
+# demand, and from the release workflow.
+on:
+  push:
+    branches: [main]
+    paths:
+      - Dockerfile
+      - install_tools.sh
+      - requirements.txt
+      - scripts/verify_image.sh
+      - .github/workflows/docker.yml
+  pull_request:
+    paths:
+      - Dockerfile
+      - install_tools.sh
+      - requirements.txt
+      - scripts/verify_image.sh
+      - .github/workflows/docker.yml
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: docker-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build and verify image (Linux)
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: docker/setup-buildx-action@v4
+
+      - name: Build image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          load: true
+          tags: watchtower:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Verify image
+        run: bash scripts/verify_image.sh watchtower:ci

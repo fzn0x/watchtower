@@ -6,6 +6,7 @@ import questionary
 
 from watchtower import __version__
 from watchtower.core.binaries import split_installed
+from watchtower.tools import ALL_TOOLS
 from watchtower.core.agent_manager import create_agent_graph
 from watchtower.core.memory import MemoryStore
 from watchtower.core.guardrails import validate_target
@@ -81,13 +82,7 @@ def main():
             bool(args.flagship), args.effort or "default", args.max_tokens or "default",
         )
 
-    all_tools = [
-        "nmap", "masscan", "httpx", "whatweb", "wafw00f",
-        "subfinder", "amass", "dnsrecon", "nuclei", "nikto",
-        "sqlmap", "wpscan", "testssl", "sslyze", "gobuster",
-        "ffuf", "arjun", "xsstrike", "gitleaks", "cmseek",
-        "retire", "dalfox", "kiterunner"
-    ]
+    all_tools = list(ALL_TOOLS)
     installed_tools, missing_tools = split_installed(all_tools)
     if missing_tools:
         logging.warning(f"Missing tools: {', '.join(missing_tools)}")
