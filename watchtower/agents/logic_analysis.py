@@ -29,7 +29,7 @@ class IDORReasoningOutput(BaseModel):
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 
-RELEVANT_TOOLS = {"httpx", "kiterunner", "arjun", "gobuster", "ffuf"}
+RELEVANT_TOOLS = {"httpx", "kiterunner", "arjun", "gobuster", "ffuf", "katana", "gau"}
 
 SYSTEM_PROMPT = """\
 You are a Senior Security Researcher specialising in Insecure Direct Object \

@@ -4,7 +4,8 @@
 # Installs: nmap, masscan, whatweb, wafw00f, httpx, subfinder,
 #           amass, dnsrecon, nuclei, nikto, sqlmap, wpscan, testssl,
 #           sslyze, gobuster, ffuf, arjun, xsstrike, gitleaks,
-#           cmseek, retire, dalfox, kiterunner
+#           cmseek, retire, dalfox, kiterunner, naabu, katana, dnsx,
+#           gau, trufflehog
 # ============================================================
 
 set -e
@@ -346,12 +347,42 @@ go_install dalfox github.com/hahwul/dalfox/v2@latest
 # 22. kiterunner
 # ════════════════════════════════════════════════════════════
 log "Installing kiterunner..."
-# Release assets are versioned, e.g. kiterunner_1.0.2_linux_amd64.tar.gz.
+# Architecture name used in release asset file names.
 case "$(uname -m)" in
-  aarch64|arm64) KITE_ARCH="arm64" ;;
-  *)             KITE_ARCH="amd64" ;;
+  aarch64|arm64) RELEASE_ARCH="arm64" ;;
+  *)             RELEASE_ARCH="amd64" ;;
 esac
-github_release_install kiterunner "assetnote/kiterunner" "kiterunner_[0-9.]+_linux_${KITE_ARCH}\.tar\.gz$" "kr"
+# Release assets are versioned, e.g. kiterunner_1.0.2_linux_amd64.tar.gz.
+github_release_install kiterunner "assetnote/kiterunner" "kiterunner_[0-9.]+_linux_${RELEASE_ARCH}\.tar\.gz$" "kr"
+
+# ════════════════════════════════════════════════════════════
+# 23. naabu (port discovery; uses libpcap from the system deps)
+# ════════════════════════════════════════════════════════════
+go_install naabu github.com/projectdiscovery/naabu/v2/cmd/naabu@latest
+
+# ════════════════════════════════════════════════════════════
+# 24. katana (crawler; built with cgo)
+# ════════════════════════════════════════════════════════════
+export CGO_ENABLED=1
+go_install katana github.com/projectdiscovery/katana/cmd/katana@latest
+unset CGO_ENABLED
+
+# ════════════════════════════════════════════════════════════
+# 25. dnsx (DNS toolkit)
+# ════════════════════════════════════════════════════════════
+go_install dnsx github.com/projectdiscovery/dnsx/cmd/dnsx@latest
+
+# ════════════════════════════════════════════════════════════
+# 26. gau (historical URLs)
+# ════════════════════════════════════════════════════════════
+go_install gau github.com/lc/gau/v2/cmd/gau@latest
+
+# ════════════════════════════════════════════════════════════
+# 27. trufflehog (verified secret scanning)
+# ════════════════════════════════════════════════════════════
+# Release assets are versioned, e.g. trufflehog_3.99.9_linux_amd64.tar.gz, and
+# the release publishes a checksums file the helper verifies against.
+github_release_install trufflehog "trufflesecurity/trufflehog" "trufflehog_[0-9.]+_linux_${RELEASE_ARCH}\.tar\.gz$" "trufflehog"
 
 # ════════════════════════════════════════════════════════════
 # Download nuclei templates
@@ -371,7 +402,7 @@ echo "════════════════════════�
 
 TOOLS=(nmap masscan whatweb wafw00f pd-httpx subfinder amass dnsrecon nuclei \
        nikto sqlmap wpscan testssl sslyze gobuster ffuf arjun xsstrike \
-       gitleaks cmseek retire dalfox kr)
+       gitleaks cmseek retire dalfox kr naabu katana dnsx gau trufflehog)
 
 for t in "${TOOLS[@]}"; do
   if command -v "$t" &>/dev/null; then

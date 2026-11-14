@@ -1,4 +1,40 @@
+import ipaddress
 import urllib.parse
+
+# Code forges where an owner/repo path identifies a git repository.
+_GIT_HOSTS = {"github.com", "gitlab.com", "bitbucket.org"}
+
+
+def is_ip_address(host: str) -> bool:
+    """True if `host` is an IPv4 or IPv6 address rather than a hostname."""
+    try:
+        ipaddress.ip_address((host or "").strip())
+        return True
+    except ValueError:
+        return False
+
+
+def looks_like_git_repo(target: str) -> bool:
+    """True if the target looks like a cloneable git repository URL.
+
+    Secret scanners (gitleaks, trufflehog) read git history, not a live web
+    endpoint, so they only make sense against a repository.
+    """
+    if not target:
+        return False
+
+    candidate = target.strip()
+    if candidate.endswith(".git"):
+        return True
+
+    if "://" not in candidate:
+        candidate = "//" + candidate
+    parsed = urllib.parse.urlparse(candidate)
+    host = (parsed.hostname or "").lower()
+    path_parts = [p for p in parsed.path.split("/") if p]
+
+    # A known forge with an owner/repo path (e.g. github.com/owner/repo).
+    return host in _GIT_HOSTS and len(path_parts) >= 2
 
 
 def extract_hostname(target: str) -> str:
