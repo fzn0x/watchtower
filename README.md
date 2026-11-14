@@ -30,7 +30,7 @@
 ## Features
 
 - **Multi-agent architecture**: a Planner picks the next tools, a Worker runs them (in parallel when asked), an Analyst turns every tool's output into structured findings, and a Logic Analyst looks for business-logic and IDOR risk.
-- **23 integrated security tools** across network, web recon, DNS, vulnerability, TLS, content discovery, and secret scanning. See [Tools](https://fzn0x.github.io/watchtower/tools/).
+- **28 integrated security tools** across network, web recon, crawling and URL discovery, DNS, vulnerability, TLS, content discovery, and secret scanning. See [Tools](https://fzn0x.github.io/watchtower/tools/).
 - **Parallel reconnaissance** and **smart truncation** of long tool output.
 - **Run history in SQLite** with per-run PDF reports.
 - **LLM-agnostic**: OpenAI, Gemini, OpenRouter, Anthropic, LiteLLM, or any OpenAI-compatible endpoint, with opt-in flagship models and reasoning controls.

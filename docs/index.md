@@ -22,7 +22,7 @@ The loop repeats until the planner decides the assessment is complete.
 
 ## Features
 
-- **23 integrated security tools** across network, web recon, DNS, vulnerability, TLS, content discovery, and secret scanning. See [Tools](tools.md).
+- **28 integrated security tools** across network, web recon, crawling and URL discovery, DNS, vulnerability, TLS, content discovery, and secret scanning. See [Tools](tools.md).
 - **Parallel reconnaissance**: independent tools run concurrently.
 - **Smart truncation**: long tool output is clipped to keep security-relevant lines.
 - **Run history in SQLite**, with per-run PDF reports. See [Reports](reports.md).

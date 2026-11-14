@@ -8,6 +8,7 @@ Watchtower drives these tools through small Python wrappers. Each wrapper gets t
 | --- | --- | --- |
 | `nmap` | host | `nmap -sV -sC -A -Pn -T4 <host>` |
 | `masscan` | host | `masscan -p1-65535 --rate 1000 <host>` |
+| `naabu` | host | `naabu -host <host> -top-ports 1000 -silent -nc` (CONNECT scan, so no root needed) |
 
 ## Web recon
 
@@ -17,6 +18,15 @@ Watchtower drives these tools through small Python wrappers. Each wrapper gets t
 | `whatweb` | URL | `whatweb -a 3 <url>` |
 | `wafw00f` | URL | `wafw00f -a <url>` |
 
+## Crawling and URL discovery
+
+| Tool | Target | What Watchtower runs |
+| --- | --- | --- |
+| `katana` | URL | `katana -u <url> -silent -nc -d 2 -jc -timeout 10 -rl 50` (crawl depth 2, parses JavaScript for endpoints) |
+| `gau` | host | `gau <host> --providers wayback,commoncrawl,otx,urlscan --threads 5 --timeout 30 --blacklist <static assets>`; archived URLs for the host only (no subdomains, to stay in scope); skipped for IP targets |
+
+The endpoints and parameters these find feed the Logic Analyst's IDOR review, as do `httpx`, `gobuster`, `ffuf`, `arjun`, and `kiterunner`.
+
 ## Subdomains and DNS
 
 | Tool | Target | What Watchtower runs |
@@ -24,6 +34,7 @@ Watchtower drives these tools through small Python wrappers. Each wrapper gets t
 | `subfinder` | host | `subfinder -d <host> -silent -all` |
 | `amass` | host | `amass enum -passive -d <host>` |
 | `dnsrecon` | host | `dnsrecon -d <host>` |
+| `dnsx` | host | `dnsx -silent -nc -a -aaaa -cname -mx -ns -txt -resp`, with the host on stdin; skipped for IP targets |
 
 ## Vulnerability scanning
 
@@ -61,6 +72,7 @@ Watchtower drives these tools through small Python wrappers. Each wrapper gets t
 | `dalfox` | URL | `dalfox url <url> --silence --skip-bav` |
 | `cmseek` | URL | `cmseek -u <url> --batch --random-agent` |
 | `gitleaks` | git repository URL | clones the repository to a temporary directory, then `gitleaks detect --source <dir> -v`; skipped for non-repository targets |
+| `trufflehog` | git repository URL | `trufflehog git <repo> --results=verified,unknown --json --no-update`: secrets confirmed live, or whose check errored; skipped for non-repository targets |
 
 ## Authenticated requests
 
