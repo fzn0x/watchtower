@@ -1,0 +1,21 @@
+/* Brand colors: the logo's navy for the header, its signal green for links. */
+:root > * {
+  --md-primary-fg-color: #0b1220;
+  --md-primary-fg-color--light: #1b2538;
+  --md-primary-fg-color--dark: #05080f;
+  --md-primary-bg-color: #e6edf3;
+  --md-primary-bg-color--light: #e6edf3b3;
+}
+
+/* A darker green keeps links readable on white. */
+[data-md-color-scheme="default"] {
+  --md-typeset-a-color: #0a7a5a;
+  --md-accent-fg-color: #0a7a5a;
+  --md-accent-fg-color--transparent: #0a7a5a1a;
+}
+
+[data-md-color-scheme="slate"] {
+  --md-typeset-a-color: #2ee6a6;
+  --md-accent-fg-color: #2ee6a6;
+  --md-accent-fg-color--transparent: #2ee6a61a;
+}
