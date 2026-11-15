@@ -52,21 +52,60 @@ def _truthy(value) -> bool:
 
 
 # Environment variables that select a provider in get_llm, in priority order
-# after a custom WATCHTOWER_PROVIDER.
+# after a custom WATCHTOWER_PROVIDER. Claude credentials come last.
 PROVIDER_KEY_VARS = ("OPENROUTER_API_KEY", "OPENAI_API_KEY", "GEMINI_API_KEY")
+
+# Environment variables that give the Anthropic SDK a Claude credential. A
+# profile from `ant auth login` needs none of them; see claude_signed_in.
+CLAUDE_CREDENTIAL_VARS = (
+    "ANTHROPIC_API_KEY",
+    "ANTHROPIC_AUTH_TOKEN",
+    "ANTHROPIC_PROFILE",
+    "ANTHROPIC_FEDERATION_RULE_ID",
+)
 
 NO_PROVIDER_MESSAGE = (
     "No LLM provider is configured. Set one of OPENROUTER_API_KEY, OPENAI_API_KEY, "
-    "or GEMINI_API_KEY in .env, or pass --provider, --model, and --apikey."
+    "GEMINI_API_KEY, or ANTHROPIC_API_KEY in .env, sign in to Claude with "
+    "`ant auth login`, or pass --provider, --model, and --apikey."
 )
 
 
+def claude_signed_in() -> bool:
+    """True if the Anthropic SDK finds a Claude credential without environment variables.
+
+    That is the active profile from `ant auth login`. A profile that is set up
+    but broken also counts, so the SDK's own error reaches the user instead of
+    a generic "no provider" message.
+    """
+    try:
+        from anthropic.lib.credentials import default_credentials
+    except Exception:
+        return False
+    try:
+        return default_credentials() is not None
+    except Exception:
+        return True
+
+
+def has_claude_credentials(env=None) -> bool:
+    """True if Claude can authenticate: a credential variable, or (for the real environment) a login."""
+    real_env = env is None
+    env = os.environ if env is None else env
+    if any((env.get(name) or "").strip() for name in CLAUDE_CREDENTIAL_VARS):
+        return True
+    return real_env and claude_signed_in()
+
+
 def has_provider(env=None) -> bool:
-    """True if get_llm can build a model: a custom provider or a provider key is set."""
+    """True if get_llm can build a model: a custom provider, a provider key, or Claude credentials."""
+    real_env = env is None
     env = os.environ if env is None else env
     if (env.get("WATCHTOWER_PROVIDER") or "").strip():
         return True
-    return any((env.get(name) or "").strip() for name in PROVIDER_KEY_VARS)
+    if any((env.get(name) or "").strip() for name in PROVIDER_KEY_VARS):
+        return True
+    return has_claude_credentials(None if real_env else env)
 
 
 def read_llm_runtime(env=None) -> dict:

@@ -20,7 +20,7 @@ def main():
     parser.add_argument("--version", action="version", version=f"watchtower {__version__}")
     parser.add_argument("-t", "--target", help="Target URL or IP", required=False)
     parser.add_argument("--skip-ask-tools", action="store_true", help="Skip tool selection")
-    parser.add_argument("--provider", help="Custom LLM provider (e.g. litellm, openai, anthropic, bedrock, etc.)")
+    parser.add_argument("--provider", help="Custom LLM provider (e.g. litellm, openai, anthropic or claude, bedrock, etc.)")
     parser.add_argument("--model", help="Custom model string")
     parser.add_argument("--apikey", help="Environment variable name containing the API key (e.g. GROQ_API_KEY)")
     parser.add_argument("--report", help="Generate a PDF report from the SQLite database (provide output filename, e.g. report.pdf)")

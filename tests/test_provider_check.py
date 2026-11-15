@@ -2,7 +2,7 @@ import os
 import unittest
 from unittest import mock
 
-from watchtower.core.llm_config import NO_PROVIDER_MESSAGE, PROVIDER_KEY_VARS, has_provider
+from watchtower.core.llm_config import CLAUDE_CREDENTIAL_VARS, NO_PROVIDER_MESSAGE, PROVIDER_KEY_VARS, has_provider
 
 try:
     import langchain_core  # noqa: F401
@@ -12,8 +12,13 @@ except Exception:
 
 
 def _env_without_providers():
-    drop = set(PROVIDER_KEY_VARS) | {"WATCHTOWER_PROVIDER"}
+    drop = set(PROVIDER_KEY_VARS) | set(CLAUDE_CREDENTIAL_VARS) | {"WATCHTOWER_PROVIDER"}
     return {k: v for k, v in os.environ.items() if k not in drop}
+
+
+# A developer machine may be signed in with `ant auth login`; these tests
+# describe a machine with no provider at all.
+_not_signed_in = mock.patch("watchtower.core.llm_config.claude_signed_in", return_value=False)
 
 
 class HasProviderTests(unittest.TestCase):
@@ -33,8 +38,9 @@ class HasProviderTests(unittest.TestCase):
 
 
 @unittest.skipUnless(_HAS_LANGCHAIN, "langchain is not installed in this environment")
+@_not_signed_in
 class NoProviderTests(unittest.TestCase):
-    def test_get_llm_raises_a_clear_error(self):
+    def test_get_llm_raises_a_clear_error(self, _signed_in):
         # Regression: this used to return a MockLLM that could not be piped
         # into the output parser, so runs failed with an opaque error.
         from watchtower.agents import planner
@@ -44,7 +50,7 @@ class NoProviderTests(unittest.TestCase):
                 planner.get_llm()
         self.assertEqual(str(ctx.exception), NO_PROVIDER_MESSAGE)
 
-    def test_planner_reports_it_and_finishes(self):
+    def test_planner_reports_it_and_finishes(self, _signed_in):
         from watchtower.agents import planner
 
         with mock.patch.dict(os.environ, _env_without_providers(), clear=True):

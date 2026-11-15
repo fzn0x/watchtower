@@ -6,6 +6,8 @@ langchain-community>=0.1.0
 # Versions below expose reasoning_effort for flagship/reasoning models.
 langchain-openai>=1.4.1
 langchain-anthropic>=1.5.3
+# 0.98.0 added `ant auth login` profiles and workload identity federation.
+anthropic>=0.98.0
 langchain-google-genai>=4.3.1
 
 langgraph>=0.0.10
