@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/assets/watchtower.svg" alt="Watchtower: AI pentest engine" width="640">
+<img src="docs/assets/watchtower.svg" alt="Watchtower: AI-powered penetration testing" width="640">
 
 # Watchtower
 
