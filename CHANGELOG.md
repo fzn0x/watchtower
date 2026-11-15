@@ -2,6 +2,23 @@
 
 All notable changes to Watchtower are documented here.
 
+## 1.0.8
+
+### Added
+- Local models: `--provider ollama --model <name>` runs on Ollama at `localhost:11434` (`OLLAMA_BASE_URL` to change it), and any other OpenAI-compatible server (LM Studio, llama.cpp, vLLM) works as `--provider <url> --model <name>`. No API key is needed, and `--effort` reaches Ollama as `reasoning_effort`. (#51)
+- Claude sign-in: Claude is a built-in provider, and Watchtower uses the Anthropic SDK's own credential lookup, so an API key (`ANTHROPIC_API_KEY`), a gateway token (`ANTHROPIC_AUTH_TOKEN`), an `ant auth login` profile, or workload identity federation all work. `ANTHROPIC_MODEL_NAME` sets the model (default `claude-sonnet-5-5`; `--flagship` uses `claude-opus-5-5`), and `--provider claude` is an alias for `anthropic`. (#52)
+
+### Fixed
+- Claude requests no longer send a temperature, which current Claude models reject; `--provider anthropic` failed on `claude-sonnet-5-5`. (#52)
+- `--provider anthropic` without `--model` uses a Claude model instead of `gpt-5.6`. (#52)
+- A custom URL provider no longer receives `OPENAI_API_KEY` when `--apikey` is not given; it gets a placeholder key. (#51)
+- `--provider ollama` works; it used to fall through to LiteLLM without the `ollama/` prefix. (#51)
+
+### Changed
+- New logo: a watchtower with a laser eye, in the README, the docs header, and the favicon. (#50)
+- The documentation site moved to Fumadocs with a quiet shadcn look, at the same URLs, with built-in search. Its build fails on a broken internal link or anchor. (#53)
+- `anthropic>=0.98.0` is now required, for `ant auth login` profiles and workload identity federation. (#52)
+
 ## 1.0.7
 
 ### Added
