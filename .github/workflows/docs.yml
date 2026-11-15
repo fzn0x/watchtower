@@ -44,6 +44,9 @@ jobs:
       - name: Build (static export to docs/out)
         run: npm run build
 
+      - name: Check internal links and anchors
+        run: npm run check:links
+
       - name: Upload site for Pages
         if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v5

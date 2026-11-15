@@ -5,7 +5,8 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev",
-    "types:check": "next typegen && tsc --noEmit"
+    "types:check": "next typegen && tsc --noEmit",
+    "check:links": "node scripts/check-links.mjs"
   },
   "dependencies": {
     "fumadocs-core": "16.19.3",

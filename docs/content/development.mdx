@@ -35,7 +35,7 @@ Every push to `main` and every pull request runs:
 - the test suite on Python 3.10, 3.11, 3.12, and 3.13 with the full requirements installed;
 - repository checks (the installer is valid bash, and no em-dashes in tracked text).
 
-Changes to the Dockerfile, installer, or requirements also build the Docker image on Linux and verify it: Watchtower starts, the httpx scanner resolves ahead of Python's httpx client and probes a local server, and every supported tool is installed. Changes to the docs build this site and check its types.
+Changes to the Dockerfile, installer, or requirements also build the Docker image on Linux and verify it: Watchtower starts, the httpx scanner resolves ahead of Python's httpx client and probes a local server, and every supported tool is installed. Changes to the docs build this site, check its types, and fail on a broken internal link or anchor.
 
 ## Docs site
 
@@ -47,7 +47,7 @@ npm ci
 npm run dev
 ```
 
-Then open `http://localhost:3000/watchtower/`. `npm run build` writes the static site to `docs/out/`.
+Then open `http://localhost:3000/watchtower/`. `npm run build` writes the static site to `docs/out/`, and `npm run check:links` checks every internal link and anchor in it.
 
 ## Releases
 
