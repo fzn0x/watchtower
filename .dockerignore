@@ -1,0 +1,5 @@
+# The docs site is built separately (docs.yml); keep its local build out of the image context.
+docs/node_modules
+docs/.next
+docs/.source
+docs/out
