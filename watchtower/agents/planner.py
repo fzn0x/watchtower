@@ -6,7 +6,8 @@ from pydantic import BaseModel, Field
 from langchain_core.messages import SystemMessage, HumanMessage
 from langchain_core.output_parsers import PydanticOutputParser
 from watchtower.core.state import AgentState
-from watchtower.core.llm_config import read_llm_runtime, select_model, build_chat_kwargs, effort_notice
+from watchtower.core.llm_config import read_llm_runtime, select_model, build_chat_kwargs, effort_notice, has_claude_credentials
+from watchtower.core.claude import CLAUDE_DEFAULT_MODEL, make_chat_anthropic
 
 # get_llm runs on every agent step; only warn about a lowered effort once.
 _effort_notices_logged = set()
@@ -44,10 +45,11 @@ def get_llm():
             from langchain_openai import ChatOpenAI
             model, kwargs = settings("openai", custom_model)
             return ChatOpenAI(model=model, api_key=api_key, **kwargs)
-        elif provider == "anthropic":
-            from langchain_anthropic import ChatAnthropic
-            model, kwargs = settings("anthropic", custom_model)
-            return ChatAnthropic(model_name=model, api_key=api_key, **kwargs)
+        elif provider in ("anthropic", "claude"):
+            # Without --apikey, the Anthropic SDK finds the credential itself:
+            # ANTHROPIC_API_KEY, ANTHROPIC_AUTH_TOKEN, or an `ant auth login` profile.
+            model, kwargs = settings("anthropic", os.getenv("WATCHTOWER_MODEL") or CLAUDE_DEFAULT_MODEL)
+            return make_chat_anthropic(model, api_key=api_key, **kwargs)
         elif provider == "openrouter":
             from langchain_openai import ChatOpenAI
             model, kwargs = settings("openrouter", custom_model)
@@ -77,6 +79,9 @@ def get_llm():
         from langchain_google_genai import ChatGoogleGenerativeAI
         model, kwargs = settings("gemini", os.getenv("GEMINI_MODEL_NAME", "gemini-3.8-flash"))
         return ChatGoogleGenerativeAI(model=model, **kwargs)
+    elif has_claude_credentials():
+        model, kwargs = settings("anthropic", os.getenv("ANTHROPIC_MODEL_NAME") or CLAUDE_DEFAULT_MODEL)
+        return make_chat_anthropic(model, **kwargs)
     else:
         # main() checks this before a run starts; agents that still get here
         # report the error and end the plan instead of failing obscurely.

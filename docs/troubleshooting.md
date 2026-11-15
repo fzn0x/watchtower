@@ -2,7 +2,11 @@
 
 ## No LLM provider is configured
 
-Watchtower stops before running any tool when no provider is set. Add one of `OPENROUTER_API_KEY`, `OPENAI_API_KEY`, or `GEMINI_API_KEY` to `.env`, or pass `--provider`, `--model`, and `--apikey`. See [LLM providers](providers.md).
+Watchtower stops before running any tool when no provider is set. Add one of `OPENROUTER_API_KEY`, `OPENAI_API_KEY`, `GEMINI_API_KEY`, or `ANTHROPIC_API_KEY` to `.env`, sign in to Claude with `ant auth login`, or pass `--provider`, `--model`, and `--apikey`. See [LLM providers](providers.md).
+
+## Claude uses the wrong account, or `Could not resolve authentication method`
+
+Run `ant auth status` to see which credential the Anthropic SDK picked. An `ANTHROPIC_API_KEY` or `ANTHROPIC_AUTH_TOKEN` set in your shell or `.env` wins over an `ant auth login` profile. If a profile that used to work starts failing, its sign-in has expired: run `ant auth login` again. See [Claude](providers.md#claude).
 
 ## `model: [model_name] does not support feature: structured-outputs`
 

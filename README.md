@@ -33,7 +33,7 @@
 - **28 integrated security tools** across network, web recon, crawling and URL discovery, DNS, vulnerability, TLS, content discovery, and secret scanning. See [Tools](https://fzn0x.github.io/watchtower/tools/).
 - **Parallel reconnaissance** and **smart truncation** of long tool output.
 - **Run history in SQLite** with per-run PDF reports.
-- **LLM-agnostic**: OpenAI, Gemini, OpenRouter, Anthropic, LiteLLM, or any OpenAI-compatible endpoint, with opt-in flagship models and reasoning controls.
+- **LLM-agnostic**: OpenAI, Gemini, OpenRouter, Claude (API key or `ant auth login`), LiteLLM, or any OpenAI-compatible endpoint, with opt-in flagship models and reasoning controls.
 
 ## Quick Start
 
