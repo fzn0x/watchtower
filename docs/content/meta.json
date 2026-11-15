@@ -1,0 +1,13 @@
+{
+  "pages": [
+    "index",
+    "getting-started",
+    "usage",
+    "providers",
+    "tools",
+    "reports",
+    "troubleshooting",
+    "development",
+    "legal"
+  ]
+}

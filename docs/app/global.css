@@ -1,0 +1,114 @@
+@import 'tailwindcss';
+/* Fumadocs reads its colors from the shadcn tokens defined below. */
+@import 'fumadocs-ui/css/shadcn.css';
+@import 'fumadocs-ui/css/preset.css';
+
+/*
+ * shadcn Vega style: neutral base color, Inter, 0.625rem radius.
+ * Tokens follow https://ui.shadcn.com/docs/theming (neutral theme).
+ * The one accent is the logo's signal green. It replaces `primary`, the way
+ * shadcn's color themes do. Light mode uses a darker green (#087353) so links
+ * (5.9:1 on white) and the tinted active nav item (4.9:1) pass WCAG AA; dark
+ * mode uses the logo green #2ee6a6 itself (12:1 on the dark background).
+ */
+
+@theme inline {
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+}
+
+:root {
+  --radius: 0.625rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: #087353;
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: #087353;
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: #2ee6a6;
+  --primary-foreground: #0b1220;
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: #2ee6a6;
+  --sidebar-primary-foreground: #0b1220;
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}
+
+/* Notes use the accent; warnings keep the semantic amber. */
+:root {
+  --color-fd-info: var(--primary);
+}
+
+/*
+ * Links in page content take the accent color, as on the previous site.
+ * Keyboard keys stay neutral so the accent only marks links and position.
+ */
+.prose {
+  --tw-prose-links: var(--color-fd-primary);
+  --tw-prose-kbd-shadows: color-mix(in oklab, var(--color-fd-foreground) 20%, transparent);
+}
+
+html {
+  scrollbar-gutter: stable;
+}
+
+html > body[data-scroll-locked] {
+  margin-right: 0px !important;
+  --removed-body-scroll-bar-size: 0px !important;
+}
+
+/* An image alone in a paragraph, like the home banner, uses the paragraph spacing. */
+.prose p > img:only-child {
+  margin-block: 0;
+}
+
+/* Dialog overlay as in Vega: a light black tint under the small backdrop blur. */
+:root,
+.dark {
+  --color-fd-overlay: oklch(0 0 0 / 10%);
+}

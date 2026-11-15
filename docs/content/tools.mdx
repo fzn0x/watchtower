@@ -1,4 +1,7 @@
-# Tools
+---
+title: Tools
+description: The security tools Watchtower drives, and the exact command it runs for each one.
+---
 
 Watchtower drives these tools through small Python wrappers. Each wrapper gets the target in the form the tool expects: a bare **host** for network, DNS, and TLS tools, or a full **URL** for web tools. The planner only chooses among the tools you allow and that are installed.
 
@@ -14,7 +17,7 @@ Watchtower drives these tools through small Python wrappers. Each wrapper gets t
 
 | Tool | Target | What Watchtower runs |
 | --- | --- | --- |
-| `httpx` | URL | `httpx -u <url> -silent -nc -sc -title -td -server -cl -fr` (ProjectDiscovery's prober; see [Troubleshooting](troubleshooting.md#httpx-reports-could-not-run-or-is-shown-as-missing)) |
+| `httpx` | URL | `httpx -u <url> -silent -nc -sc -title -td -server -cl -fr` (ProjectDiscovery's prober; see [Troubleshooting](./troubleshooting.mdx#httpx-reports-could-not-run-or-is-shown-as-missing)) |
 | `whatweb` | URL | `whatweb -a 3 <url>` |
 | `wafw00f` | URL | `wafw00f -a <url>` |
 
@@ -80,4 +83,4 @@ The endpoints and parameters these find feed the Logic Analyst's IDOR review, as
 
 ## Adding a tool
 
-See [Development](development.md#adding-a-tool).
+See [Development](./development.mdx#adding-a-tool).

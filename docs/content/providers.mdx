@@ -1,4 +1,7 @@
-# LLM providers
+---
+title: LLM providers
+description: Use a hosted provider, sign in to Claude, run a local model, or point Watchtower at any endpoint.
+---
 
 ## Built-in providers
 
@@ -36,8 +39,9 @@ python -m watchtower.main -t https://www.example.com
 
 Claude is chosen automatically when none of the keys in the table above is set. To pick it explicitly, pass `--provider anthropic` (or `--provider claude`); `--model` is optional and `--apikey` is only needed to use a key from a variable with another name.
 
-!!! note "Claude subscriptions"
-    Watchtower calls the Claude API, billed to your Claude Console organization. A Claude Pro or Max subscription cannot be used: Anthropic does not allow third-party tools to offer claude.ai login.
+<Callout title="Claude subscriptions">
+Watchtower calls the Claude API, billed to your Claude Console organization. A Claude Pro or Max subscription cannot be used: Anthropic does not allow third-party tools to offer claude.ai login.
+</Callout>
 
 
 ## Custom providers
@@ -58,8 +62,9 @@ python -m watchtower.main -t https://www.example.com \
 - `openai`, `anthropic` (or `claude`, see [Claude](#claude)), `openrouter`, or `litellm`;
 - any other provider name that LangChain's `init_chat_model` understands, with LiteLLM as the fallback.
 
-!!! important
-    `--apikey` takes the **name** of the variable that holds your key in `.env` (for example `MY_GROQ_KEY`), not the key itself. This keeps secrets out of your shell history.
+<Callout title="Important">
+`--apikey` takes the **name** of the variable that holds your key in `.env` (for example `MY_GROQ_KEY`), not the key itself. This keeps secrets out of your shell history.
+</Callout>
 
 The same settings can be put in `.env`:
 
@@ -116,9 +121,10 @@ python -m watchtower.main -t https://www.example.com   --provider http://localho
 
 `--model` is required for Ollama and URL providers. No API key is needed: without `--apikey`, Watchtower sends a placeholder key, and never your `OPENAI_API_KEY`. If your server does check a key, pass `--apikey` with the name of the variable that holds it.
 
-!!! tip "Context length"
-    Watchtower sends tool output to the model, and prompts can be long. Local servers often default to a short context window and drop the start of long prompts without an error. Give the model a larger context: in Ollama, create a model with a higher `num_ctx` in its Modelfile (the OpenAI-compatible API cannot set it per request); in other servers, use their context-size setting. Larger models also follow Watchtower's JSON format more reliably.
+<Callout title="Context length">
+Watchtower sends tool output to the model, and prompts can be long. Local servers often default to a short context window and drop the start of long prompts without an error. Give the model a larger context: in Ollama, create a model with a higher `num_ctx` in its Modelfile (the OpenAI-compatible API cannot set it per request); in other servers, use their context-size setting. Larger models also follow Watchtower's JSON format more reliably.
+</Callout>
 
 ## Flagship models and reasoning
 
-See [Usage: flagship models and reasoning](usage.md#flagship-models-and-reasoning) for `--flagship`, `--effort`, and `--max-tokens`.
+See [Usage: flagship models and reasoning](./usage.mdx#flagship-models-and-reasoning) for `--flagship`, `--effort`, and `--max-tokens`.

@@ -1,20 +1,23 @@
-# Troubleshooting
+---
+title: Troubleshooting
+description: Fixes for common provider, model, and tool errors.
+---
 
 ## No LLM provider is configured
 
-Watchtower stops before running any tool when no provider is set. Add one of `OPENROUTER_API_KEY`, `OPENAI_API_KEY`, `GEMINI_API_KEY`, or `ANTHROPIC_API_KEY` to `.env`, sign in to Claude with `ant auth login`, pass `--provider`, `--model`, and `--apikey`, or run a local model with `--provider ollama --model <name>`. See [LLM providers](providers.md).
+Watchtower stops before running any tool when no provider is set. Add one of `OPENROUTER_API_KEY`, `OPENAI_API_KEY`, `GEMINI_API_KEY`, or `ANTHROPIC_API_KEY` to `.env`, sign in to Claude with `ant auth login`, pass `--provider`, `--model`, and `--apikey`, or run a local model with `--provider ollama --model <name>`. See [LLM providers](./providers.mdx).
 
 ## Claude uses the wrong account, or `Could not resolve authentication method`
 
-Run `ant auth status` to see which credential the Anthropic SDK picked. An `ANTHROPIC_API_KEY` or `ANTHROPIC_AUTH_TOKEN` set in your shell or `.env` wins over an `ant auth login` profile. If a profile that used to work starts failing, its sign-in has expired: run `ant auth login` again. See [Claude](providers.md#claude).
+Run `ant auth status` to see which credential the Anthropic SDK picked. An `ANTHROPIC_API_KEY` or `ANTHROPIC_AUTH_TOKEN` set in your shell or `.env` wins over an `ant auth login` profile. If a profile that used to work starts failing, its sign-in has expired: run `ant auth login` again. See [Claude](./providers.mdx#claude).
 
 ## A local model gives empty, cut-off, or malformed answers
 
-The model's context window is probably too small for Watchtower's prompts, so the server dropped part of them. Raise the context length (in Ollama, `num_ctx` in a Modelfile) or use a larger model. See [Local models](providers.md#local-models).
+The model's context window is probably too small for Watchtower's prompts, so the server dropped part of them. Raise the context length (in Ollama, `num_ctx` in a Modelfile) or use a larger model. See [Local models](./providers.mdx#local-models).
 
 ## `Connection refused` with a local model
 
-Check that the server is running and that the URL matches: `curl http://localhost:11434/v1/models` for Ollama. From inside Docker, `localhost` is the container itself; see [Ollama](providers.md#ollama) for `OLLAMA_BASE_URL`.
+Check that the server is running and that the URL matches: `curl http://localhost:11434/v1/models` for Ollama. From inside Docker, `localhost` is the container itself; see [Ollama](./providers.mdx#ollama) for `OLLAMA_BASE_URL`.
 
 ## `model: [model_name] does not support feature: structured-outputs`
 
