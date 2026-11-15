@@ -1,6 +1,6 @@
 # Watchtower
 
-![Watchtower](https://raw.githubusercontent.com/fzn0x/watchtower/main/assets/imgs/watchtower.png){ width="640" }
+![Watchtower: AI-powered penetration testing](assets/watchtower.svg){ width="640" }
 
 **AI-powered penetration testing automation, orchestrated by LLM agents.**
 
