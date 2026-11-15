@@ -15,6 +15,7 @@
 
 [Documentation](https://fzn0x.github.io/watchtower/) ·
 [Quick Start](#quick-start) ·
+[Models](#models) ·
 [Tools](https://fzn0x.github.io/watchtower/tools/) ·
 [Troubleshooting](https://fzn0x.github.io/watchtower/troubleshooting/)
 
@@ -48,11 +49,39 @@ python -m venv venv
 source venv/bin/activate         # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 
-cp .env.example .env             # then set OPENAI_API_KEY, GEMINI_API_KEY, or OPENROUTER_API_KEY
+cp .env.example .env             # then set a provider key, or see Models below
 python -m watchtower.main -t https://www.example.com
 ```
 
 Export the latest run as a PDF with `python -m watchtower.main --report pentest_report.pdf`.
+
+## Models
+
+Watchtower runs on hosted models or on a model on your own machine.
+
+### Claude
+
+Set `ANTHROPIC_API_KEY` in `.env`, or sign in once with the [Anthropic CLI](https://github.com/anthropics/anthropic-cli) and skip the key:
+
+```bash
+ant auth login
+python -m watchtower.main -t https://www.example.com
+```
+
+Watchtower uses the Anthropic SDK's own sign-in, so `ANTHROPIC_AUTH_TOKEN` (for a gateway or proxy) and workload identity federation (for CI) work too. The default model is `claude-sonnet-5-5`, and `--flagship` switches to `claude-opus-5-5`. Claude Pro and Max subscriptions cannot be used: Anthropic does not allow third-party tools to offer claude.ai login.
+
+### Ollama and other local models
+
+Run the model locally, so prompts and findings never leave your machine:
+
+```bash
+ollama pull llama3.3
+python -m watchtower.main -t https://www.example.com --provider ollama --model llama3.3
+```
+
+No API key is needed. Set `OLLAMA_BASE_URL` if Ollama is not at `localhost:11434`, for example when Watchtower runs in Docker. LM Studio, llama.cpp, vLLM, and other OpenAI-compatible servers work by URL: `--provider http://localhost:1234/v1 --model <name>`. Give the model a large enough context window; see [Local models](https://fzn0x.github.io/watchtower/providers/#local-models).
+
+OpenAI, Gemini, OpenRouter, LiteLLM, and custom endpoints are covered in [LLM providers](https://fzn0x.github.io/watchtower/providers/).
 
 ## Documentation
 
@@ -60,7 +89,7 @@ The full documentation lives at **[fzn0x.github.io/watchtower](https://fzn0x.git
 
 - [Getting started](https://fzn0x.github.io/watchtower/getting-started/): installation, configuration, Docker
 - [Usage](https://fzn0x.github.io/watchtower/usage/): interactive and headless runs, authenticated testing, flagship models and reasoning
-- [LLM providers](https://fzn0x.github.io/watchtower/providers/): built-in and custom providers
+- [LLM providers](https://fzn0x.github.io/watchtower/providers/): built-in providers, Claude sign-in, local models, and custom endpoints
 - [Tools](https://fzn0x.github.io/watchtower/tools/): every integrated tool and the command Watchtower runs
 - [Reports](https://fzn0x.github.io/watchtower/reports/): run history and PDF export
 - [Troubleshooting](https://fzn0x.github.io/watchtower/troubleshooting/)
@@ -74,6 +103,8 @@ The full documentation lives at **[fzn0x.github.io/watchtower](https://fzn0x.git
 - [x] Parallel tool execution and smart truncation.
 - [x] Support for authenticated pentesting (cookies / headers).
 - [x] Flagship model support with reasoning-aware configuration.
+- [x] Claude sign-in with an API key, `ant auth login`, or a gateway token.
+- [x] Local models through Ollama and any OpenAI-compatible server.
 - [x] Continuous integration, verified Docker image, and a documentation site.
 - [ ] Advanced business-logic analysis enhancements.
 
