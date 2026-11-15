@@ -42,6 +42,10 @@ DEFAULT_REASONING_MAX_TOKENS = 16000
 # than the native reasoning_effort constructor argument.
 _EXTRA_BODY_FAMILIES = {"openrouter", "http"}
 
+# Families that must not be sent a temperature. Current Claude models reject
+# any non-default sampling setting with a 400.
+_NO_TEMPERATURE_FAMILIES = {"anthropic"}
+
 
 def _truthy(value) -> bool:
     return str(value).strip().lower() in {"1", "true", "yes", "on"}
@@ -138,13 +142,14 @@ def build_chat_kwargs(family, effort=None, max_tokens=None, flagship=False, defa
     clamped to what the provider accepts, max_tokens defaults to a reasoning
     budget, and the provider's reasoning parameter is attached. When reasoning
     is off, the deterministic default temperature is kept for backward
-    compatibility.
+    compatibility, except for Claude, which rejects any temperature.
     """
     effective_effort = clamp_effort(family, resolve_effort(effort, flagship))
     kwargs = {}
 
     if effective_effort is None:
-        kwargs["temperature"] = default_temperature
+        if family not in _NO_TEMPERATURE_FAMILIES:
+            kwargs["temperature"] = default_temperature
         if max_tokens:
             kwargs["max_tokens"] = max_tokens
         return kwargs

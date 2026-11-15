@@ -108,6 +108,12 @@ class BuildChatKwargsTests(unittest.TestCase):
     def test_reasoning_off_keeps_temperature(self):
         self.assertEqual(build_chat_kwargs("openai"), {"temperature": 0})
 
+    def test_no_temperature_for_claude(self):
+        # Current Claude models reject any non-default temperature with a 400.
+        self.assertEqual(build_chat_kwargs("anthropic"), {})
+        self.assertEqual(build_chat_kwargs("anthropic", max_tokens=4096), {"max_tokens": 4096})
+        self.assertNotIn("temperature", build_chat_kwargs("anthropic", effort="xhigh"))
+
     def test_reasoning_off_max_tokens_only_when_given(self):
         self.assertEqual(build_chat_kwargs("openai", max_tokens=4096), {"temperature": 0, "max_tokens": 4096})
 
