@@ -20,7 +20,7 @@ def main():
     parser.add_argument("--version", action="version", version=f"watchtower {__version__}")
     parser.add_argument("-t", "--target", help="Target URL or IP", required=False)
     parser.add_argument("--skip-ask-tools", action="store_true", help="Skip tool selection")
-    parser.add_argument("--provider", help="Custom LLM provider (e.g. litellm, openai, anthropic or claude, bedrock, etc.)")
+    parser.add_argument("--provider", help="LLM provider: ollama for a local model, an OpenAI-compatible URL, or a name such as openai, anthropic (or claude), openrouter, litellm")
     parser.add_argument("--model", help="Custom model string")
     parser.add_argument("--apikey", help="Environment variable name containing the API key (e.g. GROQ_API_KEY)")
     parser.add_argument("--report", help="Generate a PDF report from the SQLite database (provide output filename, e.g. report.pdf)")
@@ -70,9 +70,10 @@ def main():
         logging.error("Target must be a valid URL or IP address.")
         return
 
-    from watchtower.core.llm_config import has_provider, NO_PROVIDER_MESSAGE
-    if not has_provider():
-        logging.error(NO_PROVIDER_MESSAGE)
+    from watchtower.core.llm_config import provider_error
+    problem = provider_error()
+    if problem:
+        logging.error(problem)
         raise SystemExit(1)
 
     logging.info(f"Initializing Watchtower {__version__} (Agentic Pentesting Framework)...")
