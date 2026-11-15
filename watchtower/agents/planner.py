@@ -6,7 +6,17 @@ from pydantic import BaseModel, Field
 from langchain_core.messages import SystemMessage, HumanMessage
 from langchain_core.output_parsers import PydanticOutputParser
 from watchtower.core.state import AgentState
-from watchtower.core.llm_config import read_llm_runtime, select_model, build_chat_kwargs, effort_notice, has_claude_credentials
+from watchtower.core.llm_config import (
+    MODEL_REQUIRED_MESSAGE,
+    OLLAMA_DEFAULT_BASE_URL,
+    PLACEHOLDER_API_KEY,
+    build_chat_kwargs,
+    effort_notice,
+    has_claude_credentials,
+    needs_explicit_model,
+    read_llm_runtime,
+    select_model,
+)
 from watchtower.core.claude import CLAUDE_DEFAULT_MODEL, make_chat_anthropic
 
 # get_llm runs on every agent step; only warn about a lowered effort once.
@@ -37,10 +47,24 @@ def get_llm():
         api_key = os.getenv(apikey_env_name) if apikey_env_name else None
         provider = custom_provider.lower()
 
+        if needs_explicit_model(provider) and not os.getenv("WATCHTOWER_MODEL"):
+            # main() checks this before a run; the default model name belongs
+            # to a hosted provider and would not exist on a local server.
+            raise RuntimeError(MODEL_REQUIRED_MESSAGE.format(provider=custom_provider))
+
         if provider.startswith("http"):
             from langchain_openai import ChatOpenAI
             model, kwargs = settings("http", custom_model)
-            return ChatOpenAI(model=model, api_key=api_key, base_url=custom_provider, **kwargs)
+            # Without --apikey, send a placeholder: local servers ignore it, and
+            # ChatOpenAI would otherwise send OPENAI_API_KEY to this endpoint.
+            return ChatOpenAI(model=model, api_key=api_key or PLACEHOLDER_API_KEY,
+                              base_url=custom_provider, **kwargs)
+        elif provider == "ollama":
+            from langchain_openai import ChatOpenAI
+            model, kwargs = settings("ollama", custom_model)
+            base_url = os.getenv("OLLAMA_BASE_URL") or OLLAMA_DEFAULT_BASE_URL
+            return ChatOpenAI(model=model, api_key=api_key or PLACEHOLDER_API_KEY,
+                              base_url=base_url, **kwargs)
         elif provider == "openai":
             from langchain_openai import ChatOpenAI
             model, kwargs = settings("openai", custom_model)

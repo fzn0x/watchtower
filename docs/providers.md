@@ -53,7 +53,8 @@ python -m watchtower.main -t https://www.example.com \
 
 `--provider` accepts:
 
-- a URL, used as an OpenAI-compatible endpoint (any custom HTTP endpoint works this way);
+- a URL, used as an OpenAI-compatible endpoint (any custom HTTP endpoint works this way, including [local servers](#local-models));
+- `ollama`, for a model served by [Ollama](#ollama);
 - `openai`, `anthropic` (or `claude`, see [Claude](#claude)), `openrouter`, or `litellm`;
 - any other provider name that LangChain's `init_chat_model` understands, with LiteLLM as the fallback.
 
@@ -78,7 +79,45 @@ INFO: ==> Node Executed: [ANALYST]
 INFO:     - Updated state 'findings': [{'title': 'Overly Permissive CORS Configuration', 'severity': 'Medium', ...}, {'title': 'Missing Security Headers', 'severity': 'Low', ...}]
 ```
 
-**Supported providers include:** Anthropic, OpenAI, OpenRouter, LiteLLM, Amazon Bedrock, Vercel AI Gateway, Moonshot AI, Mistral, MiniMax, OpenCode Zen, GLM models, Z.AI, Synthetic, and Qianfan, plus any OpenAI-compatible HTTP endpoint. See the full list at [docs.litellm.ai/docs/providers](https://docs.litellm.ai/docs/providers).
+**Supported providers include:** Anthropic, OpenAI, OpenRouter, LiteLLM, Amazon Bedrock, Vercel AI Gateway, Moonshot AI, Mistral, MiniMax, OpenCode Zen, GLM models, Z.AI, Synthetic, and Qianfan, plus Ollama and any OpenAI-compatible HTTP endpoint. See the full list at [docs.litellm.ai/docs/providers](https://docs.litellm.ai/docs/providers).
+
+## Local models
+
+Watchtower can run on a model served from your own machine, so target data never leaves it. Any server with an OpenAI-compatible API works.
+
+### Ollama
+
+Pull a model, then point Watchtower at Ollama with `--provider ollama`:
+
+```bash
+ollama pull llama3.3
+python -m watchtower.main -t https://www.example.com --provider ollama --model llama3.3
+```
+
+Watchtower talks to `http://localhost:11434/v1`. Set `OLLAMA_BASE_URL` to reach Ollama elsewhere, for example from inside Docker:
+
+```ini
+WATCHTOWER_PROVIDER="ollama"
+WATCHTOWER_MODEL="llama3.3"
+OLLAMA_BASE_URL="http://host.docker.internal:11434/v1"
+```
+
+On Linux, `host.docker.internal` needs `--add-host=host.docker.internal:host-gateway` on `docker run`.
+
+`--effort` is passed to Ollama as `reasoning_effort` for models that support it, such as `gpt-oss`.
+
+### LM Studio, llama.cpp, vLLM, and other servers
+
+Pass the server's OpenAI-compatible base URL as the provider. Use the address your server prints when it starts, since default ports differ between servers and versions:
+
+```bash
+python -m watchtower.main -t https://www.example.com   --provider http://localhost:1234/v1   --model qwen3-14b
+```
+
+`--model` is required for Ollama and URL providers. No API key is needed: without `--apikey`, Watchtower sends a placeholder key, and never your `OPENAI_API_KEY`. If your server does check a key, pass `--apikey` with the name of the variable that holds it.
+
+!!! tip "Context length"
+    Watchtower sends tool output to the model, and prompts can be long. Local servers often default to a short context window and drop the start of long prompts without an error. Give the model a larger context: in Ollama, create a model with a higher `num_ctx` in its Modelfile (the OpenAI-compatible API cannot set it per request); in other servers, use their context-size setting. Larger models also follow Watchtower's JSON format more reliably.
 
 ## Flagship models and reasoning
 

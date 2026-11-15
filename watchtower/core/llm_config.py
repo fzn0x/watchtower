@@ -46,6 +46,16 @@ _EXTRA_BODY_FAMILIES = {"openrouter", "http"}
 # any non-default sampling setting with a 400.
 _NO_TEMPERATURE_FAMILIES = {"anthropic"}
 
+# Local models. Ollama serves an OpenAI-compatible API here by default; any
+# other local server (LM Studio, llama.cpp, vLLM, ...) is reached through
+# --provider <url>.
+OLLAMA_DEFAULT_BASE_URL = "http://localhost:11434/v1"
+
+# Sent as the API key to Ollama and to custom URL endpoints when --apikey is
+# not given. The OpenAI client requires some key; local servers ignore it, and
+# it keeps OPENAI_API_KEY from being sent to a third-party endpoint.
+PLACEHOLDER_API_KEY = "not-needed"
+
 
 def _truthy(value) -> bool:
     return str(value).strip().lower() in {"1", "true", "yes", "on"}
@@ -67,8 +77,20 @@ CLAUDE_CREDENTIAL_VARS = (
 NO_PROVIDER_MESSAGE = (
     "No LLM provider is configured. Set one of OPENROUTER_API_KEY, OPENAI_API_KEY, "
     "GEMINI_API_KEY, or ANTHROPIC_API_KEY in .env, sign in to Claude with "
-    "`ant auth login`, or pass --provider, --model, and --apikey."
+    "`ant auth login`, pass --provider, --model, and --apikey, or run a local "
+    "model with --provider ollama --model <name>."
 )
+
+MODEL_REQUIRED_MESSAGE = (
+    "--provider {provider} needs a model name. Pass --model (for example "
+    "--model llama3.3) or set WATCHTOWER_MODEL."
+)
+
+
+def needs_explicit_model(provider) -> bool:
+    """True for providers with no sensible default model: Ollama and custom URLs."""
+    provider = (provider or "").strip().lower()
+    return provider == "ollama" or provider.startswith("http")
 
 
 def claude_signed_in() -> bool:
@@ -106,6 +128,19 @@ def has_provider(env=None) -> bool:
     if any((env.get(name) or "").strip() for name in PROVIDER_KEY_VARS):
         return True
     return has_claude_credentials(None if real_env else env)
+
+
+def provider_error(env=None):
+    """Why get_llm cannot build a model with these settings, or None if it can."""
+    real_env = env is None
+    env = os.environ if env is None else env
+    # None keeps the `ant auth login` check, which only runs for the real environment.
+    if not has_provider(None if real_env else env):
+        return NO_PROVIDER_MESSAGE
+    provider = (env.get("WATCHTOWER_PROVIDER") or "").strip()
+    if needs_explicit_model(provider) and not (env.get("WATCHTOWER_MODEL") or "").strip():
+        return MODEL_REQUIRED_MESSAGE.format(provider=provider)
+    return None
 
 
 def read_llm_runtime(env=None) -> dict:

@@ -11,7 +11,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-brightgreen.svg?style=flat-square&logo=python)](https://www.python.org/downloads/)
 [![Architecture](https://img.shields.io/badge/Architecture-LangGraph-orange.svg?style=flat-square)](https://langchain-ai.github.io/langgraph/)
-[![LLMs](https://img.shields.io/badge/LLMs-Claude%20%7C%20Gemini%20%7C%20GPT-purple.svg?style=flat-square)]()
+[![LLMs](https://img.shields.io/badge/LLMs-Claude%20%7C%20Gemini%20%7C%20GPT%20%7C%20Local-purple.svg?style=flat-square)]()
 
 [Documentation](https://fzn0x.github.io/watchtower/) ·
 [Quick Start](#quick-start) ·
@@ -33,7 +33,7 @@
 - **28 integrated security tools** across network, web recon, crawling and URL discovery, DNS, vulnerability, TLS, content discovery, and secret scanning. See [Tools](https://fzn0x.github.io/watchtower/tools/).
 - **Parallel reconnaissance** and **smart truncation** of long tool output.
 - **Run history in SQLite** with per-run PDF reports.
-- **LLM-agnostic**: OpenAI, Gemini, OpenRouter, Claude (API key or `ant auth login`), LiteLLM, or any OpenAI-compatible endpoint, with opt-in flagship models and reasoning controls.
+- **LLM-agnostic**: OpenAI, Gemini, OpenRouter, Claude (API key or `ant auth login`), LiteLLM, any OpenAI-compatible endpoint, or local models through Ollama, LM Studio, llama.cpp, and vLLM, with opt-in flagship models and reasoning controls.
 
 ## Quick Start
 
