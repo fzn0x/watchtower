@@ -1,10 +1,13 @@
-# Getting started
+---
+title: Getting started
+description: Install the security tools and Watchtower, configure an LLM provider, or run everything in Docker.
+---
 
 ## Prerequisites
 
 - **OS**: Linux or macOS recommended. Windows works through WSL2 for most networking tools.
 - **Python**: 3.10 or newer.
-- **An LLM provider**: an API key for OpenRouter, OpenAI, or Gemini, or a custom provider (see [LLM providers](providers.md)).
+- **An LLM provider**: an API key for OpenRouter, OpenAI, or Gemini, or a custom provider (see [LLM providers](./providers.mdx)).
 - **The security tools themselves** (`nmap`, `nuclei`, `httpx`, ...) installed on your `PATH`. Watchtower detects which ones are missing and leaves them out.
 
 ## Install the security tools
@@ -50,8 +53,9 @@ GEMINI_MODEL_NAME="gemini-3.8-flash"
 OPENROUTER_MODEL_NAME="anthropic/claude-sonnet-5.5"
 ```
 
-!!! note
-    Model names change often. Set these to a current model your provider offers.
+<Callout title="Note">
+Model names change often. Set these to a current model your provider offers.
+</Callout>
 
 If no provider is configured, Watchtower stops before running any tool and tells you which keys or flags to set.
 

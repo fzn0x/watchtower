@@ -1,4 +1,7 @@
-# Usage
+---
+title: Usage
+description: Run a scan, choose which tools the planner may use, test behind a login, and tune models and reasoning.
+---
 
 Give Watchtower a target URL or IP with `-t` / `--target`:
 
@@ -10,7 +13,7 @@ Print the installed version with `--version`.
 
 ## Interactive tool selection
 
-On launch, Watchtower shows a checklist of the supported tools with the installed ones pre-selected. Use ++space++ to toggle tools (narrowing what the planner may run) and ++enter++ to confirm.
+On launch, Watchtower shows a checklist of the supported tools with the installed ones pre-selected. Use <kbd>Space</kbd> to toggle tools (narrowing what the planner may run) and <kbd>Enter</kbd> to confirm.
 
 ## Headless mode
 
@@ -50,8 +53,9 @@ python -m watchtower.main -t https://www.example.com --effort high --max-tokens 
 
 When reasoning is on, Watchtower omits the `temperature` setting, since flagship and reasoning models reject a forced temperature. The same settings can be put in `.env` as `WATCHTOWER_FLAGSHIP`, `WATCHTOWER_EFFORT`, and `WATCHTOWER_MAX_TOKENS`.
 
-!!! note
-    Flagship ids and reasoning parameters change often across providers. If a model or effort value is rejected, set a current one for your provider.
+<Callout title="Note">
+Flagship ids and reasoning parameters change often across providers. If a model or effort value is rejected, set a current one for your provider.
+</Callout>
 
 ## Important notes
 
