@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/imgs/watchtower.png" alt="Watchtower" width="640">
+<img src="docs/assets/watchtower.svg" alt="Watchtower: AI pentest engine" width="640">
 
 # Watchtower
 
